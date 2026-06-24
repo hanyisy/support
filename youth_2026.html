@@ -30,7 +30,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Malgun Gothic'
 .choice.sel{border-color:#534AB7;background:#EEEDFE;color:#26215C}
 .dot{width:18px;height:18px;border-radius:50%;border:1.5px solid #ccc;flex-shrink:0;position:relative;transition:all .15s}
 .choice.sel .dot{border-color:#534AB7;background:#534AB7}
-.choice.sel .dot::after{content:'';width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.choice.sel .dot::after{content:''; width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
 .multi-dot{width:18px;height:18px;border-radius:5px;border:1.5px solid #ccc;flex-shrink:0;position:relative;transition:all .15s}
 .choice.sel .multi-dot{border-color:#534AB7;background:#534AB7}
 .choice.sel .multi-dot::after{content:'✓';color:#fff;font-size:11px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
@@ -42,6 +42,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Malgun Gothic'
 .input-row input[type=number]{flex:1;padding:11px 13px;border:1px solid #ddd;border-radius:9px;font-size:16px;color:#1a1a1a;background:#fff;-webkit-appearance:none}
 .input-row input:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,.1)}
 .unit{font-size:14px;color:#aaa;white-space:nowrap;flex-shrink:0}
+
+/* 모름/스킵 버튼 */
+.btn-skip{padding:11px 14px;border:1px solid #e0ddd8;border-radius:9px;background:#f9f8f6;font-size:13px;color:#777;cursor:pointer;white-space:nowrap}
+.btn-skip:active{background:#eee}
 
 /* select */
 select.full{width:100%;padding:11px 36px 11px 13px;border:1px solid #ddd;border-radius:9px;font-size:15px;color:#1a1a1a;background:#fff;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;margin-bottom:.875rem}
@@ -157,7 +161,16 @@ select.full:focus{outline:none;border-color:#534AB7}
 const STEPS=['basic','status','housing','income','family'];
 const STEP_LABELS=['기본 정보','취업·학적 상태','거주 형태','소득','가족 상황'];
 let cur=0;
-let D={age:'',gender:'',region_type:'',region_name:'',status:'',employed_months:'',school_type:'',self_living:'',housing_type:'',housing_cost:'',my_income:'',parent_income:'',has_dependent:'',dependent_count:'',disability:'',low_income:''};
+let D={
+  age:'',gender:'',region_type:'',region_name:'',
+  status:'',employed_months:'',school_type:'',
+  self_living:'',housing_type:'',housing_cost:'',
+  my_income:'',parent_income:'',low_income:'',
+  has_dependent:'',dependent_count:'',disability:''
+};
+
+// 2026년 기준 1인 가구 기준 중위소득 (약 258만 원 공공 고시 기준 반영)
+const MEDIAN_1 = 258; 
 
 function fmt(n){return Math.round(n).toLocaleString()}
 
@@ -177,11 +190,54 @@ function renderQ(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function ch(id,val,label,multi=false){
-  const sel=multi?(Array.isArray(D[id])&&D[id].includes(val)):D[id]===val;
-  const dc=multi?'multi-dot':'dot';
-  const oc=multi?`toggleMulti('${id}','${val}')`:`D['${id}']='${val}';renderQ()`;
-  return `<div class="choice ${sel?'sel':''}" onclick="${oc}"><div class="${dc}"></div>${label}</div>`;
+function ch(id,val,label){
+  const sel=D[id]===val;
+  return `<div class="choice ${sel?'sel':''}" onclick="D['${id}']='${val}';renderQ()"><div class="dot"></div>${label}</div>`;
+}
+
+/* 필수 항목 검증 및 Alert */
+function validateStep(){
+  if(cur===0){
+    if(!D.age || D.age < 15 || D.age > 45){ alert('올바른 나이(15~45세)를 입력해주세요.'); return false; }
+    if(!D.region_name){ alert('거주 지역을 선택해주세요.'); return false; }
+    if(!D.gender){ alert('성별을 선택해주세요.'); return false; }
+  }
+  if(cur===1){
+    if(!D.status){ alert('취업·학적 상태를 선택해주세요.'); return false; }
+    if((D.status==='employed_regular' || D.status==='employed_contract') && D.employed_months===''){ alert('현 직장 근무 기간을 입력하거나 모름을 선택해주세요.'); return false; }
+    if((D.status==='university' || D.status==='graduate') && !D.school_type){ alert('학교 종류를 선택해주세요.'); return false; }
+  }
+  if(cur===2){
+    if(!D.self_living){ alert('거주 형태를 선택해주세요.'); return false; }
+    if(D.self_living==='yes'){
+      if(!D.housing_type){ alert('주거 형태를 선택해주세요.'); return false; }
+      if(D.housing_type==='rent_monthly' && D.housing_cost===''){ alert('월세 금액을 입력하거나 모름을 선택해주세요.'); return false; }
+    }
+  }
+  if(cur===3){
+    if(D.my_income===''){ alert('본인 월 소득을 입력하거나 모름을 선택해주세요.'); return false; }
+    if(D.parent_income===''){ alert('부모 월 소득을 입력하거나 모름을 선택해주세요.'); return false; }
+    if(!D.low_income){ alert('기초생활수급/차상위 여부를 선택해주세요.'); return false; }
+  }
+  if(cur===4){
+    if(!D.has_dependent){ alert('부양 가족 여부를 선택해주세요.'); return false; }
+    if(D.has_dependent==='yes' && !D.dependent_count){ alert('부양 가족 수를 입력해주세요.'); return false; }
+    if(!D.disability){ alert('장애 등록 여부를 선택해주세요.'); return false; }
+  }
+  return true;
+}
+
+function goNext(){
+  if(validateStep()) { cur++; renderQ(); }
+}
+function goBack(){
+  cur--; renderQ();
+}
+
+/* 모름(스킵) 처리 함수 */
+function skipField(id, defaultVal){
+  D[id] = defaultVal;
+  renderQ();
 }
 
 function step0(){
@@ -190,7 +246,11 @@ function step0(){
   return `<div class="qtitle">기본 정보를 알려주세요</div>
 <div class="qsub">나이와 지역에 따라 받을 수 있는 지원이 달라져요.</div>
 <div class="input-group"><label>나이</label>
-  <div class="input-row"><input type="number" min="15" max="45" placeholder="예: 25" value="${D.age}" inputmode="numeric" pattern="[0-9]*" oninput="D.age=this.value"><span class="unit">세</span></div>
+  <div class="input-row">
+    <input type="number" min="15" max="45" placeholder="예: 25" value="${D.age}" inputmode="numeric" oninput="D.age=this.value">
+    <span class="unit">세</span>
+    <button class="btn-skip" onclick="skipField('age', 25)">모름 (25세 기준)</button>
+  </div>
 </div>
 <div class="input-group"><label>거주 지역</label>
   <select class="full" onchange="D.region_name=this.value;D.region_type=${JSON.stringify(regions)}[this.value]||''">
@@ -217,10 +277,14 @@ function step1(){
   ${ch('status','jobseeker','취업 준비 중 (취준생)')}
   ${ch('status','university','대학교 재학·휴학')}
   ${ch('status','graduate','대학원 재학·휴학')}
-  ${ch('status','neet','미취업·미재학 (쉬는 중)')}
+  ${ch('status','neet','미취업·쉬는 중')}
 </div>
 ${isEmp?`<div class="input-group"><label>현 직장 근무 기간</label>
-  <div class="input-row"><input type="number" min="0" placeholder="예: 6" value="${D.employed_months}" inputmode="numeric" oninput="D.employed_months=this.value"><span class="unit">개월</span></div>
+  <div class="input-row">
+    <input type="number" min="0" placeholder="예: 6" value="${D.employed_months}" inputmode="numeric" oninput="D.employed_months=this.value">
+    <span class="unit">개월</span>
+    <button class="btn-skip" onclick="skipField('employed_months', 0)">모름 (0개월)</button>
+  </div>
 </div>`:''}
 ${isStu?`<div class="input-group"><label>학교 종류</label>
   <div class="choices">
@@ -250,19 +314,31 @@ ${D.self_living==='yes'?`
   </div>
 </div>
 ${D.housing_type==='rent_monthly'?`<div class="input-group"><label>월 임차료 (월세 금액)</label>
-  <div class="input-row"><input type="number" min="0" placeholder="예: 45" value="${D.housing_cost||''}" inputmode="decimal" oninput="D.housing_cost=this.value"><span class="unit">만 원</span></div>
+  <div class="input-row">
+    <input type="number" min="0" placeholder="예: 45" value="${D.housing_cost}" inputmode="decimal" oninput="D.housing_cost=this.value">
+    <span class="unit">만 원</span>
+    <button class="btn-skip" onclick="skipField('housing_cost', 0)">모름 (0원)</button>
+  </div>
 </div>`:''}`:'' }
 <div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`;
 }
 
 function step3(){
   return `<div class="qtitle">소득을 입력해 주세요</div>
-<div class="qsub">월 평균 기준. 없으면 0으로 두세요.</div>
-<div class="input-group"><label>본인 월 소득 (세전 기준)</label>
-  <div class="input-row"><input type="number" min="0" placeholder="예: 220" value="${D.my_income}" inputmode="decimal" oninput="D.my_income=this.value"><span class="unit">만 원</span></div>
+<div class="qsub">월 평균 기준 (세전). 잘 모르면 모름 버튼을 눌러주세요.</div>
+<div class="input-group"><label>본인 월 소득</label>
+  <div class="input-row">
+    <input type="number" min="0" placeholder="예: 220" value="${D.my_income}" inputmode="decimal" oninput="D.my_income=this.value">
+    <span class="unit">만 원</span>
+    <button class="btn-skip" onclick="skipField('my_income', 0)">모름 (0원)</button>
+  </div>
 </div>
-<div class="input-group"><label>부모(가구) 월 소득 합계 <span style="color:#bbb;font-weight:400">어림값도 괜찮아요</span></label>
-  <div class="input-row"><input type="number" min="0" placeholder="예: 500" value="${D.parent_income}" inputmode="decimal" oninput="D.parent_income=this.value"><span class="unit">만 원</span></div>
+<div class="input-group"><label>부모(가구) 월 소득 합계</label>
+  <div class="input-row">
+    <input type="number" min="0" placeholder="예: 500" value="${D.parent_income}" inputmode="decimal" oninput="D.parent_income=this.value">
+    <span class="unit">만 원</span>
+    <button class="btn-skip" onclick="skipField('parent_income', 450)">모름 (평균 기준)</button>
+  </div>
 </div>
 <div class="input-group"><label>기초생활수급자 또는 차상위계층인가요?</label>
   <div class="choices" style="flex-direction:row;gap:7px">
@@ -274,7 +350,7 @@ function step3(){
 
 function step4(){
   return `<div class="qtitle">가족 상황을 알려주세요</div>
-<div class="input-group"><label>부양 가족이 있나요? (본인이 생계를 책임지는 가족)</label>
+<div class="input-group"><label>부양 가족이 있나요?</label>
   <div class="choices">
     ${ch('has_dependent','no','없어요')}${ch('has_dependent','yes','있어요')}
   </div>
@@ -290,16 +366,9 @@ ${D.has_dependent==='yes'?`<div class="input-group"><label>부양 가족 수</la
 <div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="showResult()">결과 보기</button></div>`;
 }
 
-function toggleMulti(id,val){
-  if(!Array.isArray(D[id]))D[id]=[];
-  const i=D[id].indexOf(val);
-  if(i>=0)D[id].splice(i,1);else D[id].push(val);
-  renderQ();
-}
-function goNext(){cur++;renderQ()}
-function goBack(){cur--;renderQ()}
-
 function showResult(){
+  if(!validateStep()) return;
+  
   document.getElementById('form-area').style.display='none';
   const ra=document.getElementById('result-area');
   ra.style.display='block';
@@ -322,59 +391,48 @@ function showResult(){
   const hasDependent=D.has_dependent==='yes';
   const isDisability=D.disability==='yes';
 
-  const MEDIAN_1=249;
   const myPct=Math.round(myInc/MEDIAN_1*100);
   const hhPct=Math.round(totalHH/MEDIAN_1*100);
 
+  // 2026년 실제 대한민국 청년 대상 실존 정책 리스트 및 자격 로직 엄격화
   const supports=[
-    {cat:'🏠 주거 지원',icon:'🏠',title:'청년 월세 특별지원',desc:'무주택 청년 월 최대 20만 원 × 24개월. 만 19~34세, 독립거주, 소득 중위 60% 이하.',amt:'월 최대 20만 원',link:'https://www.myhome.go.kr',
-      ok:age>=19&&age<=34&&isSelfLiving&&isMonthlyRent&&myPct<=60,
-      cond:age>=19&&age<=34&&isSelfLiving&&isMonthlyRent&&myPct>60&&myPct<=80,
-      reason:age<19||age>34?'나이 조건 미충족 (19~34세)':!isSelfLiving?'독립 거주 필요':!isMonthlyRent?'월세 거주 필요':myPct>80?'소득 기준 초과':''},
-    {cat:'🏠 주거 지원',icon:'🏠',title:'행복주택 (청년형)',desc:'만 19~39세 무주택 청년. 시세 60~80% 수준 공공임대.',amt:'시세 60~80%',link:'https://www.lh.or.kr',
-      ok:age>=19&&age<=39&&D.housing_type!=='public',cond:false,reason:age<19||age>39?'나이 조건 미충족':'이미 공공임대 거주 중'},
-    {cat:'🏠 주거 지원',icon:'🏠',title:'청년 전세임대',desc:'LH가 기존주택과 전세계약 후 저렴하게 재임대. 대학생·취준생 대상.',amt:'보증금 100~200만 원',link:'https://www.lh.or.kr',
-      ok:age>=18&&age<=39&&(isJobseeker||isStudent),cond:isEmployed&&age<=39,reason:age>39?'나이 조건 초과':''},
-    {cat:'🏠 주거 지원',icon:'🏠',title:'청년주택드림 청약통장',desc:'만 19~34세, 연소득 5,000만 원 이하. 최고 4.5% 금리 + 청약 당첨 시 대출 연계.',amt:'이자 최고 4.5%',link:'https://www.molit.go.kr',
-      ok:age>=19&&age<=34&&myInc*12<=5000&&isSelfLiving,cond:age>=19&&age<=34&&myInc*12<=5000&&!isSelfLiving,reason:age<19||age>34?'나이 조건 미충족':myInc*12>5000?'연소득 5,000만 원 초과':''},
-    {cat:'💳 금융 지원',icon:'💳',title:'청년도약계좌',desc:'만 19~34세, 연소득 7,500만 원 이하. 5년 만기 정부기여금 + 비과세.',amt:'월 최대 70만 원 납입',link:'https://www.kinfa.or.kr',
-      ok:age>=19&&age<=34&&myInc*12<=7500&&myInc>0,cond:age>=19&&age<=34&&myInc===0,reason:age<19||age>34?'나이 조건 미충족':myInc*12>7500?'연소득 초과':'소득 없는 경우 제한 가능'},
-    {cat:'💳 금융 지원',icon:'💳',title:'청년도약계좌 환승 연계',desc:'만기 적금 자산을 도약계좌로 일시 납입 — 기여금 매칭·비과세 혜택 유지.',amt:'기여금 매칭',link:'https://www.kinfa.or.kr',
-      ok:age>=19&&age<=34,cond:false,reason:'도약계좌 신규·환승 조건 확인 필요'},
-    {cat:'💳 금융 지원',icon:'💳',title:'햇살론유스',desc:'만 19~34세, 연소득 3,500만 원 이하 또는 재학생. 저금리 대출 최대 1,200만 원.',amt:'최대 1,200만 원',link:'https://www.kinfa.or.kr',
-      ok:age>=19&&age<=34&&(myInc*12<=3500||isStudent),cond:false,reason:age<19||age>34?'나이 조건 미충족':''},
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'국민취업지원제도 (국취제)',desc:'구직촉진수당 월 50만 원 × 6개월 + 맞춤형 취업 지원.',amt:'월 50만 원 × 6개월',link:'https://www.work.go.kr',
-      ok:isJobseeker&&myInc*12<=3000&&hhPct<=60,cond:isJobseeker&&(myInc*12>3000||hhPct>60),reason:!isJobseeker?'구직 중이 아닌 경우':myInc*12>3000?'소득 기준 초과':''},
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'내일배움카드',desc:'직업훈련비 지원. 5년간 최대 500만 원 한도. 재직자·실업자 모두 가능.',amt:'최대 500만 원',link:'https://www.hrd.go.kr',
+    {cat:'🏠 주거 지원',icon:'🏠',title:'청년 월세 특별지원(국토부)',desc:'무주택 청년 월 최대 20만 원 생애 1회 지원. 만 19~34세 독립거주, 청년독립가구 중위 60% 이하 및 원가구 100% 이하.',amt:'월 최대 20만 원',link:'https://www.myhome.go.kr',
+      ok:age>=19&&age<=34&&isSelfLiving&&isMonthlyRent&&myPct<=60&&hhPct<=100,
+      cond:age>=19&&age<=34&&isSelfLiving&&isMonthlyRent&&(myPct>60||hhPct>100)&&myPct<=80,
+      reason:age<19||age>34?'나이 조건 미충족 (19~34세)':!isSelfLiving?'독립 거주(자취) 필요':!isMonthlyRent?'월세 거주자 한정':myPct>60?'원가구 혹은 청도가구 소득 기준 초과':''},
+    
+    {cat:'🏠 주거 지원',icon:'🏠',title:'LH 행복주택 (청년형)',desc:'만 19~39세 무주택 청년 대상 시세 60~80% 수준 공급 공공임대주택.',amt:'시세 60~80%',link:'https://www.lh.or.kr',
+      ok:age>=19&&age<=39&&D.housing_type!=='public',cond:false,reason:age<19||age>39?'나이 조건 미충족(19~39세)':'이미 공공임대 거주 중'},
+    
+    {cat:'🏠 주거 지원',icon:'🏠',title:'청년주택드림 청약통장',desc:'만 19~34세 무주택자, 연소득 5,000만 원 이하 우대형 청약. 최고 4.5% 금리 및 대출 연계.',amt:'이자 최고 4.5%',link:'https://www.molit.go.kr',
+      ok:age>=19&&age<=34&&myInc*12<=5000,cond:false,reason:age<19||age>34?'나이 조건 미충족':myInc*12>5000?'연소득 5,000만 원 초과':''},
+    
+    {cat:'💳 금융 지원',icon:'💳',title:'청년도약계좌',desc:'만 19~34세, 개인소득 연 7,500만 원 이하 및 가구 중위 180% 이하 대상 비과세 자산형성 지원.',amt:'정부 기여금 매칭',link:'https://www.kinfa.or.kr',
+      ok:age>=19&&age<=34&&myInc*12<=7500&&myInc>0,cond:age>=19&&age<=34&&myInc===0,reason:age<19||age>34?'나이 조건 미충족':myInc*12>7500?'연소득 초과':'소득증빙 의무 필수'},
+    
+    {cat:'💳 금융 지원',icon:'💳',title:'햇살론유스(서민금융진흥원)',desc:'만 19~34세 대학생, 미취업 청년 및 사회초년생(재직 1년 이하) 대상 저금리 서민금융 대출.',amt:'최대 1,200만 원',link:'https://www.kinfa.or.kr',
+      ok:age>=19&&age<=34&&(myInc*12<=3500||isStudent||isJobseeker),cond:false,reason:age<19||age>34?'나이 조건 미충족':myInc*12>3500?'연 소득 3,500만 원 초과':''},
+    
+    {cat:'💼 취업·교육 지원',icon:'💼',title:'국민취업지원제도 (I유형)',desc:'구직촉진수당 월 50만 원 × 6개월 지급 및 맞춤형 취업지원 서비스 제공 (중위소득 60% 이하 등).',amt:'월 50만 원 × 6개월',link:'https://www.work.go.kr',
+      ok:isJobseeker&&hhPct<=60,cond:isJobseeker&&hhPct>60,reason:!isJobseeker?'구직 준비 상태 필요':'소득 조건에 따라 II유형 연계 가능'},
+    
+    {cat:'💼 취업·교육 지원',icon:'💼',title:'국민내일배움카드',desc:'일자리를 찾는 구직자 및 재직자에게 직업훈련비 전액 또는 일부 지원 (5년간 최대 500만 원).',amt:'최대 500만 원 지원',link:'https://www.hrd.go.kr',
       ok:true,cond:false,reason:''},
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'청년도전지원사업',desc:'구직단념 청년 대상 맞춤 프로그램 + 이수 시 최대 300만 원 수당.',amt:'최대 300만 원',link:'https://www.work.go.kr',
-      ok:D.status==='neet'&&myInc===0,cond:isJobseeker&&myInc===0,reason:!isJobseeker&&D.status!=='neet'?'구직단념 청년 대상':''},
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'청년 일자리 도약 장려금',desc:'취업애로청년을 정규직 채용한 중소기업에 장려금 지원 — 구직자에게 유리.',amt:'기업 수령 장려금',link:'https://www.work.go.kr',
-      ok:isJobseeker&&age<=34,cond:isEmployed&&!isRegular&&age<=34,reason:age>34?'만 34세 이하':''},
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'공공기관 청년 인턴십',desc:'일경험 제공 인턴 매칭. 경력 형성 및 임금 지급.',amt:'경력 + 임금',link:'https://www.work.go.kr',
-      ok:isJobseeker&&age<=34,cond:false,reason:''},
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'대학생 현장실습 학점연계',desc:'재학 중 기업 현장실습 시 실습지원비 수령 + 학점 인정.',amt:'실습지원비',link:'https://www.work.go.kr',
-      ok:isStudent,cond:false,reason:'재학생 한정'},
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'청년 자립 수당 (지자체)',desc:`${D.region_name||'거주 지역'} 등 지자체별 자립·생활비 지원사업 운영.`,amt:'지자체별 상이',link:'https://www.youthcenter.go.kr',
+    
+    {cat:'💼 취업·교육 지원',icon:'💼',title:'청년일자리도약장려금',desc:'취업애로청년을 정규직 채용한 중소기업에 지원금 지급 (취준생 고용 촉진 인센티브).',amt:'기업 인센티브 제공',link:'https://www.work.go.kr',
+      ok:isJobseeker&&age<=34,cond:false,reason:'취업 준비 청년 채용 시 기업 혜택'},
+    
+    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'지자체 청년수당 및 기본소득',desc:'서울 청년수당, 경기 청년기본소득 등 미취업/경제활동 지원 지자체 특화 제도.',amt:'지역별 상이',link:'https://www.youthcenter.go.kr',
+      ok:age>=19&&age<=34&&(isCapital||isMidSize),cond:isLocal,reason:''},
+    
+    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'청년마음건강 바우처',desc:'만 19~34세 청년 대상 정서·심리 전문 상담 서비스 제공 (소득 제한 없음 우선순위 존재).',amt:'상담 바우처 지원',link:'https://www.mohw.go.kr',
       ok:age>=19&&age<=34,cond:false,reason:''},
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'청년 마음건강 바우처',desc:'전문 심리상담 바우처. 만 19~34세, 소득 기준 있음.',amt:'바우처 지원',link:'https://www.mohw.go.kr',
-      ok:age>=19&&age<=34&&myPct<=120,cond:age>=19&&age<=34&&myPct>120,reason:age<19||age>34?'나이 조건 미충족':''},
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'기초수급 청년 자산형성 지원',desc:'수급·차상위 청년 대상 자산형성 우대 혜택.',amt:'수급 종류별 상이',link:'https://www.bokjiro.go.kr',
-      ok:isLowIncome,cond:myPct<=50&&!isLowIncome,reason:'수급 자격 별도 심사 필요'},
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'장애인 청년 고용·교육 지원',desc:'장애 등록 청년 대상 취업 연계 + 훈련수당 + 맞춤 인프라.',amt:'조건별 상이',link:'https://www.kead.or.kr',
-      ok:isDisability,cond:false,reason:'장애 등록자 해당'},
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'부양가족 인적공제 (연말정산)',desc:'부양가족이 있는 근로자 — 인당 150만 원 소득공제.',amt:'인당 150만 원 공제',link:'https://www.nts.go.kr',
-      ok:hasDependent&&isEmployed,cond:hasDependent&&!isEmployed,reason:'근로소득자에게 해당'},
-    {cat:'📚 장학·교육비 지원',icon:'📚',title:'국가장학금 (한국장학재단)',desc:'2026년 확대 기조 — 소득구간별 등록금 맞춤 지원.',amt:'최대 전액',link:'https://www.kosaf.go.kr',
-      ok:isStudent&&D.school_type!=='graduate'&&hhPct<=200,cond:isStudent&&hhPct>200,reason:!isStudent?'재학생 해당':D.school_type==='graduate'?'대학원생은 별도 기준':''},
-    {cat:'📚 장학·교육비 지원',icon:'📚',title:'대학원생 연구장려금 (BK21 등)',desc:'이공계·인문사회 석·박사 대학원생 연구 전념 지원금.',amt:'월 70~130만 원',link:'https://www.nrf.re.kr',
-      ok:D.status==='graduate'||D.school_type==='graduate',cond:false,reason:'대학원생 해당'},
-    {cat:'📚 장학·교육비 지원',icon:'📚',title:'학자금 대출 (든든·일반)',desc:'재학 중 등록금·생활비 대출. 취업 후 소득 발생 시 상환.',amt:'등록금 + 생활비',link:'https://www.kosaf.go.kr',
-      ok:isStudent,cond:false,reason:'재학생 한정'},
-    {cat:'📍 지역 특화 지원',icon:'📍',title:'지방 청년 정착 지원금',desc:'비수도권 이주 청년 정착지원금 + 창업·일자리 매칭.',amt:'지역별 조건 상이',link:'https://www.youthcenter.go.kr',
-      ok:isLocal,cond:isMidSize,reason:isCapital?'수도권 해당 없음':''},
-    {cat:'📍 지역 특화 지원',icon:'📍',title:`${D.region_name||'지역'} 청년 공간·수당`,desc:`${D.region_name||'해당 지자체'} 교통비·문화비·수당 통합 매칭 포털.`,amt:'지역별 다양',link:'https://www.youthcenter.go.kr',
-      ok:!!D.region_name,cond:false,reason:''},
+    
+    {cat:'📚 장학·교육비 지원',icon:'📚',title:'국가장학금 (한국장학재단)',desc:'대학생 가구 소득연계형 맞춤형 등록금 지원 제도.',amt:'구간별 차등/전액',link:'https://www.kosaf.go.kr',
+      ok:isStudent&&D.school_type!=='graduate',cond:false,reason:!isStudent?'대학 재학생 대상':D.school_type==='graduate'?'대학원생 별도 기준 적용':''},
+    
+    {cat:'📚 장학·교육비 지원',icon:'📚',title:'취업 후 상환 학자금대출',desc:'대학(원)생의 학업 안정을 위해 등록금과 생활비를 대출하고 취업 후 소득 발생 시 상환.',amt:'등록금+생활비',link:'https://www.kosaf.go.kr',
+      ok:isStudent,cond:false,reason:'대학(원) 재학생 한정'}
   ];
 
   const okList=supports.filter(s=>s.ok);
@@ -401,14 +459,13 @@ function showResult(){
   let html=`<div class="card">
     <div class="res-badge ${badgeClass}">해당 ${okList.length}개 · 조건부 ${condList.length}개</div>
     <div class="res-title">${D.region_name||''}${D.region_name?' ':''}${D.age}세 청년 지원 진단 결과</div>
-    <div class="res-desc">2026년 기준 중위소득(1인 249만 원)을 기반으로 계산된 결과예요.</div>
+    <div class="res-desc">2026년 기준 1인 가구 중위소득(약 ${MEDIAN_1}만 원)을 기반으로 정밀 진단된 결과예요.</div>
     <div class="metric-grid">
-      <div class="metric"><div class="mlbl">본인 소득</div><div class="mval">${myInc?fmt(myInc)+'만':'미입력'}</div><div class="msub">월 기준</div></div>
-      <div class="metric"><div class="mlbl">중위소득 대비</div><div class="mval" style="color:${myPct<=60?'#534AB7':myPct<=100?'#BA7517':'#888'}">${myInc?myPct+'%':'-'}</div><div class="msub">2026 1인</div></div>
+      <div class="metric"><div class="mlbl">본인 소득</div><div class="mval">${myInc?fmt(myInc)+'만':'0원/미입력'}</div><div class="msub">월 세전 기준</div></div>
+      <div class="metric"><div class="mlbl">중위소득 대비</div><div class="mval" style="color:${myPct<=60?'#534AB7':myPct<=100?'#BA7517':'#888'}">${myInc?myPct+'%':'-'}</div><div class="msub">2026 1인 가구</div></div>
       <div class="metric"><div class="mlbl">해당 지원</div><div class="mval" style="color:#534AB7">${okList.length}개</div><div class="msub">조건부 ${condList.length}개</div></div>
     </div>
-    ${!isSelfLiving&&age>=19&&age<=34?`<div class="info-box">💡 독립(자취)하면 월세지원·전세임대·행복주택 신청이 가능해져요.</div>`:''}
-    ${isCapital&&myPct<=80?`<div class="info-box">📍 수도권 거주자는 서울·경기 청년 수당 정책도 별도로 확인해 보세요.</div>`:''}
+    ${!isSelfLiving&&age>=19&&age<=34?`<div class="info-box">💡 부모님과 동거 중이시군요. 독립(자취) 가구를 구성하면 청년 월세 지원 및 공공임대 주택 신청 자격 확보에 유리해집니다.</div>`:''}
   </div>`;
 
   cats.forEach(cat=>{
@@ -419,19 +476,19 @@ function showResult(){
     html+='</div></div>';
   });
 
-  html+=`<div class="card"><div class="cat-title">💡 통합 신청 창구</div>
+  html+=`<div class="card"><div class="cat-title">💡 공식 통합 신청 창구</div>
   <div class="tip-grid">
-    <div class="tip-card"><strong>복지로</strong>복지 지원 전반<br>bokjiro.go.kr</div>
-    <div class="tip-card"><strong>청년정책 포털</strong>청년 특화 지원<br>youthcenter.go.kr</div>
-    <div class="tip-card"><strong>한국장학재단</strong>장학금·학자금<br>kosaf.go.kr</div>
-    <div class="tip-card"><strong>워크넷</strong>취업·훈련 지원<br>work.go.kr</div>
+    <div class="tip-card"><strong>정부24 / 복지로</strong>정부 복지 지원 포털<br>bokjiro.go.kr</div>
+    <div class="tip-card"><strong>온통청년</strong>국가 청년정책 통합 센터<br>youthcenter.go.kr</div>
+    <div class="tip-card"><strong>한국장학재단</strong>국가장학금 및 학자금대출<br>kosaf.go.kr</div>
+    <div class="tip-card"><strong>고용24</strong>취업 지원 및 직업훈련<br>work.go.kr</div>
   </div>
-  <div class="warn-box" style="margin-bottom:0">⚠ 2026년 예산 및 시행계획 기반. 부처별 세부 기준은 변동될 수 있으니 신청 전 공식 창구에서 재확인하세요.</div>
+  <div class="warn-box" style="margin-bottom:0">⚠ 본 진단 결과는 2026년 공고 지침 기준이나, 부처 및 지자체별 세부 재산 기준 및 추가 배점 조건에 따라 실신청 시 결과가 다를 수 있으므로 링크된 공식 창구 조회를 권장합니다.</div>
   </div>`;
 
-  html+=`<button class="apply-btn" onclick="window.open('https://www.youthcenter.go.kr','_blank')">청년정책 포털에서 더 찾아보기 →</button>
+  html+=`<button class="apply-btn" onclick="window.open('https://www.youthcenter.go.kr','_blank')">온통청년 포털에서 추가 정책 찾기 →</button>
   <button class="retry-btn" onclick="restart()">처음부터 다시 진단하기</button>
-  <p class="notice">이 진단 결과는 참고용이에요. 실제 지원 자격은 담당 기관에서 최종 확인하세요.</p>`;
+  <p class="notice">이 결과는 모의 계산 기능이며, 실제 수급 가능 여부는 해당 시행 기관의 심사 결과에 따릅니다.</p>`;
 
   ra.innerHTML=html;
 }
