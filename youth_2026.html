@@ -3,152 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>2026 청년 지원 자격 진단</title>
+<title>2026 청년 지원금 가능성 탐색기</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f4f0;min-height:100vh;display:flex;justify-content:center;padding:1.5rem .875rem 3rem}
-.container{width:100%;max-width:600px}
-.page-title{font-size:13px;font-weight:500;color:#aaa;text-align:center;margin-bottom:1.25rem;letter-spacing:.03em}
-
-/* 카드 */
-.card{background:#fff;border-radius:16px;border:1px solid #e8e6e0;padding:1.25rem;margin-bottom:.875rem}
-
-/* 스텝바 */
-.step-bar{display:flex;gap:4px;margin-bottom:.35rem}
-.seg{flex:1;height:3px;border-radius:2px;background:#e8e6e0;transition:background .3s}
-.seg.done{background:#534AB7}.seg.active{background:#AFA9EC}
-.step-lbl{font-size:12px;color:#aaa;margin-bottom:1.25rem}
-
-/* 제목 */
-.qtitle{font-size:17px;font-weight:500;color:#1a1a1a;margin-bottom:.35rem;line-height:1.45}
-.qsub{font-size:13px;color:#999;margin-bottom:1.1rem;line-height:1.6}
-
-/* 선택지 */
-.choices{display:flex;flex-direction:column;gap:7px;margin-bottom:1.1rem}
-.choice{display:flex;align-items:center;gap:10px;padding:13px 14px;border:1px solid #e0ddd8;border-radius:11px;cursor:pointer;font-size:15px;color:#1a1a1a;transition:border-color .15s,background .15s;user-select:none;-webkit-user-select:none}
-.choice:active{background:#f0eeff}
-.choice.sel{border-color:#534AB7;background:#EEEDFE;color:#26215C}
-.dot{width:18px;height:18px;border-radius:50%;border:1.5px solid #ccc;flex-shrink:0;position:relative;transition:all .15s}
-.choice.sel .dot{border-color:#534AB7;background:#534AB7}
-.choice.sel .dot::after{content:''; width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-.multi-dot{width:18px;height:18px;border-radius:5px;border:1.5px solid #ccc;flex-shrink:0;position:relative;transition:all .15s}
-.choice.sel .multi-dot{border-color:#534AB7;background:#534AB7}
-.choice.sel .multi-dot::after{content:'✓';color:#fff;font-size:11px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
-
-/* 입력 */
-.input-group{margin-bottom:1rem}
-.input-group label{display:block;font-size:13px;color:#999;margin-bottom:5px;line-height:1.4}
-.input-row{display:flex;align-items:center;gap:8px}
-.input-row input[type=number]{flex:1;padding:11px 13px;border:1px solid #ddd;border-radius:9px;font-size:16px;color:#1a1a1a;background:#fff;-webkit-appearance:none}
-.input-row input:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,.1)}
-.unit{font-size:14px;color:#aaa;white-space:nowrap;flex-shrink:0}
-
-/* 모름/스킵 버튼 */
-.btn-skip{padding:11px 14px;border:1px solid #e0ddd8;border-radius:99px;background:#f9f8f6;font-size:13px;color:#777;cursor:pointer;white-space:nowrap}
-.btn-skip:active{background:#eee}
-
-/* select */
-select.full{width:100%;padding:11px 36px 11px 13px;border:1px solid #ddd;border-radius:9px;font-size:15px;color:#1a1a1a;background:#fff;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;margin-bottom:.875rem}
-select.full:focus{outline:none;border-color:#534AB7}
-
-/* 버튼 */
-.btn-row{display:flex;gap:8px;margin-top:1.1rem}
-.btn{flex:1;padding:14px;border-radius:11px;font-size:15px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#333;transition:all .15s;-webkit-appearance:none}
-.btn:active{background:#f5f4f0;transform:scale(.99)}
-.btn.pri{background:#534AB7;color:#fff;border-color:#534AB7;font-weight:500}
-.btn.pri:active{background:#3C3489}
-.btn.ghost{flex:0 0 auto;min-width:72px;color:#aaa;font-size:14px}
-
-/* 결과 뱃지 */
-.res-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:999px;font-size:12px;font-weight:500;margin-bottom:.875rem}
-.badge-many{background:#EEEDFE;color:#26215C}
-.badge-some{background:#FAEEDA;color:#412402}
-.badge-few{background:#f5f4f0;color:#555}
-.res-title{font-size:18px;font-weight:500;color:#1a1a1a;margin-bottom:.4rem;line-height:1.4}
-.res-desc{font-size:13px;color:#999;line-height:1.7;margin-bottom:1.1rem}
-
-/* 메트릭 */
-.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1.1rem}
-.metric{background:#f5f4f0;border-radius:10px;padding:.7rem .8rem}
-.metric .mlbl{font-size:11px;color:#aaa;margin-bottom:3px;line-height:1.3}
-.metric .mval{font-size:16px;font-weight:500;color:#1a1a1a;line-height:1.2}
-.metric .msub{font-size:10px;color:#bbb;margin-top:2px}
-
-/* 카테고리 타이틀 */
-.cat-title{font-size:13px;font-weight:500;color:#534AB7;margin-bottom:.65rem;display:flex;align-items:center;gap:5px;padding-bottom:.5rem;border-bottom:1px solid #EEEDFE}
-
-/* 지원 항목 */
-.support-list{display:flex;flex-direction:column;gap:7px}
-.si{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start;padding:11px 12px;border:1px solid #e8e6e0;border-radius:10px}
-.si.ok{border-color:#AFA9EC;background:#fafafe}
-.si.cond{border-color:#FAC775;background:#fffdf7}
-.si.no{opacity:.5}
-.si-icon{font-size:16px;margin-top:2px}
-.si-body{}
-.si-header{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px}
-.si-title{font-size:13px;font-weight:500;color:#1a1a1a;flex:1;line-height:1.35}
-.si-amt{font-size:11px;font-weight:500;white-space:nowrap;flex-shrink:0;margin-top:1px}
-.si-amt.ok{color:#3C3489}.si-amt.cond{color:#854F0B}.si-amt.no{color:#bbb}
-.si-desc{font-size:11px;color:#aaa;line-height:1.5;margin-bottom:3px}
-.si-reason{font-size:11px;color:#E24B4A;margin-bottom:3px;line-height:1.4}
-.si-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px}
-.tag-ok{background:#EEEDFE;color:#3C3489}
-.tag-cond{background:#FAEEDA;color:#633806}
-.tag-no{background:#f0ede8;color:#888}
-.si-link{font-size:11px;color:#534AB7;text-decoration:none}
-
-/* 인포/경고박스 */
-.warn-box{padding:10px 13px;background:#FAEEDA;border-left:3px solid #EF9F27;border-radius:0 8px 8px 0;font-size:12px;color:#412402;line-height:1.6;margin-bottom:.75rem}
-.info-box{padding:10px 13px;background:#EEEDFE;border-left:3px solid #7F77DD;border-radius:0 8px 8px 0;font-size:12px;color:#26215C;line-height:1.6;margin-bottom:.75rem}
-
-/* 팁 그리드 */
-.tip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem}
-.tip-card{background:#f5f4f0;border-radius:10px;padding:.75rem;font-size:12px;color:#666;line-height:1.6}
-.tip-card strong{display:block;font-size:13px;color:#1a1a1a;margin-bottom:2px;font-weight:500}
-
-/* 하단 버튼 */
-.apply-btn{width:100%;padding:15px;border-radius:12px;background:#534AB7;color:#fff;font-size:15px;font-weight:500;border:none;cursor:pointer;margin-top:1.25rem;margin-bottom:8px;-webkit-appearance:none}
-.apply-btn:active{background:#3C3489}
-.retry-btn{width:100%;padding:12px;border-radius:12px;background:transparent;color:#aaa;font-size:13px;border:1px solid #e0ddd8;cursor:pointer;-webkit-appearance:none}
-.retry-btn:active{background:#f5f4f0}
-.notice{font-size:11px;color:#bbb;text-align:center;line-height:1.6;margin-top:.5rem;padding:0 .5rem}
-
-/* 미디어쿼리 */
-@media(max-width:400px){
-  body{padding:1rem .75rem 2.5rem}
-  .card{padding:1rem .875rem}
-  .qtitle{font-size:16px}
-  .choice{font-size:14px;padding:11px 12px}
-  .btn{padding:13px;font-size:14px}
-  .apply-btn{font-size:14px;padding:14px}
-  .metric-grid{gap:6px}
-  .metric .mval{font-size:14px}
-  .metric .mlbl{font-size:10px}
-  .si{padding:10px 10px;gap:7px}
-  .si-title{font-size:12px}
-  .tip-grid{grid-template-columns:1fr 1fr}
+:root{
+  --bg:#f5f4f0;--card:#fff;--line:#e8e6e0;--text:#1a1a1a;--muted:#999;--weak:#bbb;
+  --pri:#534AB7;--pri2:#7F77DD;--pri3:#EEEDFE;--deep:#26215C;
+  --warn:#EF9F27;--warnbg:#FAEEDA;--warntext:#412402;
+  --good:#2F7D55;--goodbg:#EAF7EF;--bad:#D94A44;--badbg:#FDEDEC;
+  --shadow:0 10px 30px rgba(25,22,50,.06)
 }
-@media(max-width:360px){
-  .metric-grid{grid-template-columns:1fr 1fr 1fr}
-  .metric .mval{font-size:13px}
-  .choices{gap:6px}
-  .choice{padding:10px 11px;font-size:13px}
-}
-@media(min-width:560px){
-  body{padding:2rem 1rem 3rem}
-  .card{padding:1.5rem}
-  .qtitle{font-size:18px}
-  .choice{font-size:15px}
-}
-@supports(padding-bottom:env(safe-area-inset-bottom)){
-  body{padding-bottom:calc(3rem + env(safe-area-inset-bottom))}
-}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;justify-content:center;padding:1.5rem .875rem 3rem;color:var(--text)}
+.container{width:100%;max-width:680px}
+.page-title{font-size:13px;font-weight:600;color:#aaa;text-align:center;margin-bottom:.4rem;letter-spacing:.03em}
+.page-sub{font-size:12px;color:#b5b1aa;text-align:center;line-height:1.55;margin-bottom:1.15rem}
+.card{background:var(--card);border-radius:18px;border:1px solid var(--line);padding:1.25rem;margin-bottom:.875rem;box-shadow:var(--shadow)}
+.step-bar{display:flex;gap:4px;margin-bottom:.35rem}.seg{flex:1;height:3px;border-radius:2px;background:#e8e6e0;transition:background .3s}.seg.done{background:var(--pri)}.seg.active{background:#AFA9EC}
+.step-lbl{font-size:12px;color:#aaa;margin-bottom:1.1rem}.qtitle{font-size:18px;font-weight:700;color:#181818;margin-bottom:.4rem;line-height:1.42;letter-spacing:-.02em}.qsub{font-size:13px;color:var(--muted);margin-bottom:1.1rem;line-height:1.65}.qsub b{color:var(--pri);font-weight:700}
+.choices{display:flex;flex-direction:column;gap:7px;margin-bottom:1.05rem}.choices.row{flex-direction:row;flex-wrap:wrap}.choice{display:flex;align-items:center;gap:10px;padding:13px 14px;border:1px solid #e0ddd8;border-radius:12px;cursor:pointer;font-size:15px;color:#1a1a1a;transition:border-color .15s,background .15s,transform .12s;user-select:none;-webkit-user-select:none;background:#fff;line-height:1.35}.choice:active{background:#f0eeff;transform:scale(.99)}.choice.sel{border-color:var(--pri);background:var(--pri3);color:var(--deep);font-weight:600}.choice small{display:block;font-size:11px;color:#999;margin-top:2px;font-weight:400}.choice.sel small{color:#6b63c4}
+.dot{width:18px;height:18px;border-radius:50%;border:1.5px solid #ccc;flex-shrink:0;position:relative;transition:all .15s}.choice.sel .dot{border-color:var(--pri);background:var(--pri)}.choice.sel .dot::after{content:'';width:6px;height:6px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.multi-dot{width:18px;height:18px;border-radius:5px;border:1.5px solid #ccc;flex-shrink:0;position:relative;transition:all .15s}.choice.sel .multi-dot{border-color:var(--pri);background:var(--pri)}.choice.sel .multi-dot::after{content:'✓';color:#fff;font-size:11px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.input-group{margin-bottom:1rem}.input-group label{display:flex;align-items:center;gap:5px;font-size:13px;color:#777;margin-bottom:6px;line-height:1.45;font-weight:600}.input-row{display:flex;align-items:center;gap:8px}.input-row input[type=number],.input-row input[type=text]{flex:1;padding:12px 13px;border:1px solid #ddd;border-radius:10px;font-size:16px;color:#1a1a1a;background:#fff;-webkit-appearance:none}.input-row input:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(83,74,183,.1)}.unit{font-size:14px;color:#aaa;white-space:nowrap;flex-shrink:0}.btn-skip{padding:11px 14px;border:1px solid #e0ddd8;border-radius:99px;background:#f9f8f6;font-size:13px;color:#777;cursor:pointer;white-space:nowrap}.btn-skip:active{background:#eee}
+select.full{width:100%;padding:12px 36px 12px 13px;border:1px solid #ddd;border-radius:10px;font-size:15px;color:#1a1a1a;background:#fff;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;margin-bottom:.875rem}select.full:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(83,74,183,.1)}
+.btn-row{display:flex;gap:8px;margin-top:1.1rem}.btn{flex:1;padding:14px;border-radius:12px;font-size:15px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#333;transition:all .15s;-webkit-appearance:none}.btn:active{background:#f5f4f0;transform:scale(.99)}.btn.pri{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:700}.btn.pri:active{background:#3C3489}.btn.ghost{flex:0 0 auto;min-width:78px;color:#888;font-size:14px}.btn.disabled{opacity:.45;pointer-events:none}
+.help{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:#f1f0f8;color:var(--pri);font-size:11px;font-weight:800;cursor:pointer}.tip{padding:10px 12px;background:#f8f7ff;border:1px solid #e7e4ff;border-radius:12px;font-size:12px;color:#4c468e;line-height:1.6;margin-bottom:.9rem}.tip strong{font-weight:800;color:#2d286f}.mini-note{font-size:11px;color:#aaa;line-height:1.55;margin-top:-.35rem;margin-bottom:.85rem}
+.res-head{background:linear-gradient(135deg,#fff,#f8f7ff);border-color:#dad6ff}.res-badge{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:.875rem}.badge-many{background:var(--pri3);color:var(--deep)}.badge-some{background:var(--warnbg);color:var(--warntext)}.badge-few{background:#f5f4f0;color:#555}.res-title{font-size:20px;font-weight:800;color:#1a1a1a;margin-bottom:.45rem;line-height:1.4;letter-spacing:-.03em}.res-desc{font-size:13px;color:#777;line-height:1.75;margin-bottom:1.1rem}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:.25rem}.metric{background:#f5f4f0;border-radius:12px;padding:.8rem .75rem}.metric .mlbl{font-size:11px;color:#aaa;margin-bottom:4px;line-height:1.3}.metric .mval{font-size:17px;font-weight:800;color:#1a1a1a;line-height:1.2}.metric .msub{font-size:10px;color:#bbb;margin-top:3px;line-height:1.35}.cat-title{font-size:14px;font-weight:800;color:var(--pri);margin-bottom:.7rem;display:flex;align-items:center;gap:5px;padding-bottom:.55rem;border-bottom:1px solid var(--pri3)}.support-list{display:flex;flex-direction:column;gap:8px}.si{display:grid;grid-template-columns:30px 1fr;gap:9px;align-items:start;padding:12px;border:1px solid #e8e6e0;border-radius:13px;background:#fff}.si.very{border-color:#9fd4b2;background:#fbfffc}.si.high{border-color:#AFA9EC;background:#fcfbff}.si.check{border-color:#FAC775;background:#fffdf7}.si.low{opacity:.64}.si-icon{font-size:18px;margin-top:2px}.si-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px}.si-title{font-size:14px;font-weight:800;color:#1a1a1a;flex:1;line-height:1.35;letter-spacing:-.01em}.si-score{font-size:11px;font-weight:900;white-space:nowrap;flex-shrink:0;margin-top:1px;padding:3px 7px;border-radius:999px;background:#f3f2ef;color:#666}.si.very .si-score{background:var(--goodbg);color:var(--good)}.si.high .si-score{background:var(--pri3);color:var(--deep)}.si.check .si-score{background:var(--warnbg);color:#854F0B}.si-desc{font-size:12px;color:#777;line-height:1.55;margin-bottom:7px}.si-list{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}.si-line{font-size:11px;line-height:1.45;color:#888}.si-line.good{color:#2F7D55}.si-line.need{color:#854F0B}.si-line.bad{color:#D94A44}.si-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:800}.tag-very{background:var(--goodbg);color:var(--good)}.tag-high{background:var(--pri3);color:#3C3489}.tag-check{background:var(--warnbg);color:#633806}.tag-low{background:#f0ede8;color:#888}.si-link{font-size:11px;color:var(--pri);text-decoration:none;font-weight:700}.warn-box,.info-box,.good-box{padding:11px 13px;border-radius:0 10px 10px 0;font-size:12px;line-height:1.65;margin-bottom:.75rem}.warn-box{background:var(--warnbg);border-left:3px solid var(--warn);color:var(--warntext)}.info-box{background:var(--pri3);border-left:3px solid var(--pri2);color:var(--deep)}.good-box{background:var(--goodbg);border-left:3px solid var(--good);color:#185739}.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:.75rem}.filter-btn{flex:0 0 auto;padding:8px 11px;border-radius:999px;border:1px solid #e0ddd8;background:#fff;font-size:12px;color:#777;cursor:pointer}.filter-btn.on{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:800}.glossary{display:grid;grid-template-columns:1fr 1fr;gap:8px}.term{background:#f8f7f4;border:1px solid #ece9e2;border-radius:12px;padding:10px}.term strong{display:block;font-size:12px;color:#222;margin-bottom:3px}.term span{display:block;font-size:11px;color:#777;line-height:1.55}.apply-btn,.retry-btn{width:100%;border-radius:13px;cursor:pointer;-webkit-appearance:none}.apply-btn{padding:15px;background:var(--pri);color:#fff;font-size:15px;font-weight:800;border:none;margin-top:1.25rem;margin-bottom:8px}.apply-btn:active{background:#3C3489}.retry-btn{padding:12px;background:transparent;color:#888;font-size:13px;border:1px solid #e0ddd8}.retry-btn:active{background:#f5f4f0}.notice{font-size:11px;color:#aaa;text-align:center;line-height:1.7;margin-top:.55rem;padding:0 .5rem}.hide{display:none!important}
+@media(max-width:440px){body{padding:1rem .75rem 2.5rem}.card{padding:1rem .875rem;border-radius:16px}.qtitle{font-size:17px}.choice{font-size:14px;padding:11px 12px}.btn{padding:13px;font-size:14px}.metric-grid{gap:6px}.metric{padding:.7rem .55rem}.metric .mval{font-size:14px}.metric .mlbl{font-size:10px}.si{padding:10px;gap:7px;grid-template-columns:26px 1fr}.si-title{font-size:13px}.glossary{grid-template-columns:1fr}.choices.row .choice{flex:1 1 calc(50% - 7px)}}
+@media(min-width:560px){body{padding:2rem 1rem 3rem}.card{padding:1.5rem}.qtitle{font-size:19px}.choice{font-size:15px}}
+@supports(padding-bottom:env(safe-area-inset-bottom)){body{padding-bottom:calc(3rem + env(safe-area-inset-bottom))}}
 </style>
 </head>
 <body>
 <div class="container">
-  <p class="page-title">2026 청년 지원 자격 진단</p>
+  <p class="page-title">2026 청년 지원금 가능성 탐색기</p>
+  <p class="page-sub">“이거 한번 신청해봐”라고 알려주기 위한 간편 진단용입니다.<br>ai와 합작하여 제작했습니다! 오류가 있을수 있음을 미리 고지드립니다<br>실제 선정은 기관 심사·공고문 기준이 우선이에요.</p>
   <div id="form-area">
     <div class="step-bar" id="stepbar"></div>
     <div class="step-lbl" id="steplbl"></div>
@@ -156,355 +44,264 @@ select.full:focus{outline:none;border-color:#534AB7}
   </div>
   <div id="result-area" style="display:none"></div>
 </div>
-
 <script>
-const STEPS=['basic','status','housing','income','family'];
-const STEP_LABELS=['기본 정보','취업·학적 상태','거주 형태','소득','가족 상황'];
+const STEPS=['basic','status','housing','money','work','extra'];
+const STEP_LABELS=['기본 정보','학업·취업 상태','주거 정보','소득·재산','근로 정보','우선 확인 항목'];
+const MEDIAN_1 = 256.4; // 2026년 1인 가구 기준 중위소득 약 256.4만원
 let cur=0;
+let activeFilter='all';
 let D={
-  age:'',gender:'',region_type:'',region_name:'',
-  status:'',employed_months:'',school_type:'',
-  self_living:'',housing_type:'',housing_cost:'',
-  my_income:'',parent_income:'',low_income:'',
-  has_dependent:'',dependent_count:'',disability:''
+  age:'', region:'', ggArea:'', ggLongResidence:'',
+  status:'', graduated:'', schoolLevel:'',
+  selfLiving:'', housingType:'', homeOwner:'unknown', deposit:'', monthlyRent:'',
+  myIncome:'', householdLevel:'unknown', lowIncome:'unknown', assetBand:'unknown', carBand:'unknown',
+  workPeriod:'unknown', insured:'unknown', companyType:'unknown', weeklyHours:'unknown',
+  priorities:['housing','saving','job','education','local','culture','health'],
+  militaryExtension:'unknown'
 };
-
-// 지역 분류 데이터 전역 격리
-const REGIONS={'서울':'capital','경기':'capital','인천':'capital','부산':'metro','대구':'metro','광주':'metro','대전':'metro','울산':'metro','세종':'metro','강원':'local','충북':'local','충남':'local','전북':'local','전남':'local','경북':'local','경남':'local','제주':'local'};
-
-// 2026년 기준 1인 가구 기준 중위소득
-const MEDIAN_1 = 258; 
-
+const REGIONS=['서울','경기','인천','부산','대구','광주','대전','울산','세종','강원','충북','충남','전북','전남','경북','경남','제주'];
+const PRIORITY_LABELS={housing:'주거',saving:'저축·금융',job:'취업·훈련',education:'교육·장학',local:'지역정책',culture:'문화',health:'심리·복지'};
+function qs(id){return document.getElementById(id)}
 function fmt(n){return Math.round(n).toLocaleString()}
-
-function renderBar(){
-  document.getElementById('stepbar').innerHTML=STEPS.map((_,i)=>`<div class="seg ${i<cur?'done':i===cur?'active':''}"></div>`).join('');
-  document.getElementById('steplbl').textContent=`${cur+1} / ${STEPS.length} — ${STEP_LABELS[cur]}`;
-}
-
-function renderQ(){
-  renderBar();
-  const el=document.getElementById('qarea');
-  if(cur===0) el.innerHTML=step0();
-  else if(cur===1) el.innerHTML=step1();
-  else if(cur===2) el.innerHTML=step2();
-  else if(cur===3) el.innerHTML=step3();
-  else el.innerHTML=step4();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function ch(id,val,label){
-  const sel=D[id]===val;
-  return `<div class="choice ${sel?'sel':''}" onclick="D['${id}']='${val}';renderQ()"><div class="dot"></div>${label}</div>`;
-}
-
-function updateRegion(val) {
-  D.region_name = val;
-  D.region_type = REGIONS[val] || '';
-}
-
+function isUnknown(v){return v===''||v===undefined||v===null||v==='unknown'}
+function boolVal(v){ if(v==='yes')return true; if(v==='no')return false; return 'unknown'; }
+function num(v){const n=parseFloat(v); return Number.isFinite(n)?n:null;}
+function annualIncome(){const m=num(D.myIncome); return m===null?null:m*12;}
+function hhLevelNum(){return D.householdLevel==='unknown'?null:parseInt(D.householdLevel,10)}
+function assetNum(){return D.assetBand==='unknown'?null:parseInt(D.assetBand,10)}
+function carNum(){return D.carBand==='unknown'?null:parseInt(D.carBand,10)}
+function ageIn(min,max){const a=parseInt(D.age,10); if(!a)return false; return a>=min&&a<=max}
+function ageUnknown(){return !parseInt(D.age,10)}
+function incomeUnderAnnual(max){const a=annualIncome(); if(a===null)return 'unknown'; return a<=max}
+function myMonthlyUnder(max){const m=num(D.myIncome); if(m===null)return 'unknown'; return m<=max}
+function hhUnder(pct){const h=hhLevelNum(); if(h===null)return 'unknown'; return h<=pct}
+function assetUnder(maxManwon){const a=assetNum(); if(a===null)return 'unknown'; return a<=maxManwon}
+function carUnder(maxManwon){const c=carNum(); if(c===null)return 'unknown'; return c<=maxManwon}
+function renderBar(){qs('stepbar').innerHTML=STEPS.map((_,i)=>`<div class="seg ${i<cur?'done':i===cur?'active':''}"></div>`).join('');qs('steplbl').textContent=`${cur+1} / ${STEPS.length} — ${STEP_LABELS[cur]}`}
+function renderQ(){renderBar();const el=qs('qarea');el.innerHTML=[step0,step1,step2,step3,step4,step5][cur]();window.scrollTo({top:0,behavior:'smooth'});}
+function ch(id,val,label,sub=''){const sel=D[id]===val;return `<div class="choice ${sel?'sel':''}" onclick="D['${id}']='${val}';renderQ()"><div class="dot"></div><div>${label}${sub?`<small>${sub}</small>`:''}</div></div>`}
+function multi(id,val,label,sub=''){const arr=D[id]||[];const sel=arr.includes(val);return `<div class="choice ${sel?'sel':''}" onclick="toggleMulti('${id}','${val}')"><div class="multi-dot"></div><div>${label}${sub?`<small>${sub}</small>`:''}</div></div>`}
+function toggleMulti(id,val){const arr=D[id]||[];D[id]=arr.includes(val)?arr.filter(x=>x!==val):arr.concat(val);renderQ();}
+function optRegion(){return REGIONS.map(r=>`<option value="${r}" ${D.region===r?'selected':''}>${r}</option>`).join('')}
 function validateStep(){
-  if(cur===0){
-    if(!D.age || D.age < 15 || D.age > 45){ alert('올바른 나이(15~45세)를 입력해주세요.'); return false; }
-    if(!D.region_name){ alert('거주 지역을 선택해주세요.'); return false; }
-    if(!D.gender){ alert('성별을 선택해주세요.'); return false; }
-  }
-  if(cur===1){
-    if(!D.status){ alert('취업·학적 상태를 선택해주세요.'); return false; }
-    if((D.status==='employed_regular' || D.status==='employed_contract') && D.employed_months===''){ alert('현 직장 근무 기간을 입력하거나 모름을 선택해주세요.'); return false; }
-    if((D.status==='university' || D.status==='graduate') && !D.school_type){ alert('학교 종류를 선택해주세요.'); return false; }
-  }
-  if(cur===2){
-    if(!D.self_living){ alert('거주 형태를 선택해주세요.'); return false; }
-    if(D.self_living==='yes'){
-      if(!D.housing_type){ alert('주거 형태를 선택해주세요.'); return false; }
-      if(D.housing_type==='rent_monthly' && D.housing_cost===''){ alert('월세 금액을 입력하거나 모름을 선택해주세요.'); return false; }
-    }
-  }
-  if(cur===3){
-    if(D.my_income===''){ alert('본인 월 소득을 입력하거나 모름을 선택해주세요.'); return false; }
-    if(D.parent_income===''){ alert('부모 월 소득을 입력하거나 모름을 선택해주세요.'); return false; }
-    if(!D.low_income){ alert('기초생활수급/차상위 여부를 선택해주세요.'); return false; }
-  }
-  if(cur===4){
-    if(!D.has_dependent){ alert('부양 가족 여부를 선택해주세요.'); return false; }
-    if(D.has_dependent==='yes' && !D.dependent_count){ alert('부양 가족 수를 입력해주세요.'); return false; }
-    if(!D.disability){ alert('장애 등록 여부를 선택해주세요.'); return false; }
-  }
+  if(cur===0){if(!D.age||D.age<15||D.age>45){alert('나이는 15~45세 범위로 입력해주세요.');return false} if(!D.region){alert('거주 지역을 선택해주세요.');return false}}
+  if(cur===1){if(!D.status){alert('현재 상태를 선택해주세요.');return false} if((D.status==='jobseeker'||D.status==='neet')&&!D.graduated){alert('최종학력 졸업 여부를 선택해주세요.');return false} if((D.status==='student_univ'||D.status==='student_grad')&&!D.schoolLevel){alert('학교 구분을 선택해주세요.');return false}}
+  if(cur===2){if(!D.selfLiving){alert('거주 형태를 선택해주세요.');return false} if(!D.housingType){alert('주거 유형을 선택해주세요.');return false}}
+  if(cur===3){if(!D.householdLevel){alert('가구소득 구간을 선택해주세요.');return false}}
   return true;
 }
-
-function goNext(){
-  if(validateStep()) { cur++; renderQ(); }
+function goNext(){if(validateStep()){cur++;renderQ()}}
+function goBack(){cur=Math.max(0,cur-1);renderQ()}
+function skipField(id,val){D[id]=val;renderQ()}
+function step0(){return `<div class="qtitle">기본 정보를 알려주세요</div><div class="qsub">나이와 지역은 거의 모든 청년정책의 1차 조건이에요.</div>
+<div class="input-group"><label>나이</label><div class="input-row"><input type="number" min="15" max="45" placeholder="예: 24" value="${D.age}" inputmode="numeric" oninput="D.age=this.value"><span class="unit">세</span></div></div>
+<div class="input-group"><label>거주 지역</label><select class="full" onchange="D.region=this.value; if(this.value!=='경기'){D.ggArea='';D.ggLongResidence=''} renderQ()"><option value="">지역 선택</option>${optRegion()}</select></div>
+${D.region==='경기'?`<div class="tip"><strong>경기 청년기본소득 확인용</strong><br>2026년에는 성남시·고양시는 청년기본소득 지급 제외로 공지되어 있어 따로 물어봐요.</div><div class="input-group"><label>경기도 세부 지역</label><div class="choices row">${ch('ggArea','normal','성남·고양 아님')}${ch('ggArea','excluded','성남 또는 고양')}${ch('ggArea','unknown','모름')}</div></div><div class="input-group"><label>경기도 거주 기간</label><div class="choices">${ch('ggLongResidence','yes','3년 이상 계속 거주 또는 합산 10년 이상')}${ch('ggLongResidence','no','아직 그 정도는 아님')}${ch('ggLongResidence','unknown','모름')}</div></div>`:''}
+<div class="btn-row"><button class="btn pri" onclick="goNext()">다음 →</button></div>`}
+function step1(){const showGrad=D.status==='jobseeker'||D.status==='neet';const showSchool=D.status==='student_univ'||D.status==='student_grad';return `<div class="qtitle">지금 어떤 상태에 가장 가까워요?</div><div class="qsub">취업·장학·청년수당 계열 정책을 나누는 기준이에요.</div>
+<div class="choices">${ch('status','student_univ','대학생·휴학생','전문대/4년제 포함')}${ch('status','student_grad','대학원생')}${ch('status','jobseeker','취업 준비 중','졸업 후 구직 중')}${ch('status','neet','미취업·쉬는 중')}${ch('status','employed_regular','정규직 재직 중')}${ch('status','employed_contract','계약직·파견직 재직 중')}${ch('status','parttime','아르바이트')}${ch('status','freelancer','프리랜서')}${ch('status','self_employed','자영업·사업자')}</div>
+${showGrad?`<div class="input-group"><label>최종학력은 졸업/중퇴/제적 상태인가요? <span class="help" onclick="alert('서울 청년수당, 부산 디딤돌카드 등 일부 미취업 청년 지원은 재학생보다 졸업·중퇴·제적자를 우선 조건으로 봅니다.')">?</span></label><div class="choices">${ch('graduated','yes','예, 졸업·중퇴·제적 상태')}${ch('graduated','no','아니오, 아직 재학/휴학 중')}${ch('graduated','unknown','모름')}</div></div>`:''}
+${showSchool?`<div class="input-group"><label>학교 구분</label><div class="choices">${ch('schoolLevel','college2','전문대/2·3년제')}${ch('schoolLevel','college4','4년제 대학')}${ch('schoolLevel','graduate','대학원')}</div></div>`:''}
+<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`}
+function step2(){const monthly=D.housingType==='monthly';return `<div class="qtitle">주거 정보를 알려주세요</div><div class="qsub">월세지원, 전세대출, 행복주택, 전세임대 쪽을 확인해요.</div>
+<div class="tip"><strong>무주택</strong>은 보통 본인 또는 세대가 집을 소유하지 않은 상태를 말해요. 헷갈리면 ‘모름’을 눌러도 돼요.</div>
+<div class="input-group"><label>현재 따로 살고 있나요?</label><div class="choices">${ch('selfLiving','yes','부모님과 따로 거주','자취/독립')}${ch('selfLiving','no','부모님·가족과 거주')}${ch('selfLiving','dorm','기숙사·공동생활관')}${ch('selfLiving','unknown','모름')}</div></div>
+<div class="input-group"><label>주거 유형</label><div class="choices">${ch('housingType','monthly','월세')}${ch('housingType','jeonse','전세')}${ch('housingType','public','공공임대/행복주택 거주')}${ch('housingType','own','자가')}${ch('housingType','etc','기타/모름')}</div></div>
+<div class="input-group"><label>본인 명의 집이 있나요?</label><div class="choices row">${ch('homeOwner','no','없음')}${ch('homeOwner','yes','있음')}${ch('homeOwner','unknown','모름')}</div></div>
+${monthly?`<div class="input-group"><label>월세 금액</label><div class="input-row"><input type="number" min="0" placeholder="예: 45" value="${D.monthlyRent}" inputmode="decimal" oninput="D.monthlyRent=this.value"><span class="unit">만 원</span><button class="btn-skip" onclick="skipField('monthlyRent','')">모름</button></div></div><div class="input-group"><label>보증금</label><div class="input-row"><input type="number" min="0" placeholder="예: 500" value="${D.deposit}" inputmode="decimal" oninput="D.deposit=this.value"><span class="unit">만 원</span><button class="btn-skip" onclick="skipField('deposit','')">모름</button></div></div>`:''}
+<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`}
+function step3(){return `<div class="qtitle">소득과 재산을 대략 알려주세요</div><div class="qsub">정확한 건 건강보험료/소득인정액으로 다시 봐야 해서, 여기서는 <b>가능성</b>만 계산해요.</div>
+<div class="tip"><strong>기준중위소득</strong> = 정부가 복지 대상자를 정할 때 쓰는 “가구소득 기준선”이에요. 모르면 ‘모름’을 선택해도 결과에 확인 필요로 표시돼요.</div>
+<div class="input-group"><label>본인 월 소득 <span class="help" onclick="alert('세전 월평균 기준으로 넣으면 됩니다. 정확히 모르면 비워도 돼요. 단, 청년도약계좌/월세지원/햇살론유스 정확도는 떨어집니다.')">?</span></label><div class="input-row"><input type="number" min="0" placeholder="예: 220" value="${D.myIncome}" inputmode="decimal" oninput="D.myIncome=this.value"><span class="unit">만 원</span><button class="btn-skip" onclick="skipField('myIncome','')">모름</button></div></div>
+<div class="input-group"><label>가구소득이 기준중위소득 몇 %쯤인가요?</label><select class="full" onchange="D.householdLevel=this.value"><option value="unknown" ${D.householdLevel==='unknown'?'selected':''}>모름</option><option value="50" ${D.householdLevel==='50'?'selected':''}>50% 이하 / 기초·차상위에 가까움</option><option value="60" ${D.householdLevel==='60'?'selected':''}>60% 이하</option><option value="100" ${D.householdLevel==='100'?'selected':''}>100% 이하</option><option value="120" ${D.householdLevel==='120'?'selected':''}>120% 이하</option><option value="150" ${D.householdLevel==='150'?'selected':''}>150% 이하</option><option value="180" ${D.householdLevel==='180'?'selected':''}>180% 이하</option><option value="999" ${D.householdLevel==='999'?'selected':''}>180% 초과로 추정</option></select></div>
+<div class="input-group"><label>기초생활수급자 또는 차상위계층인가요?</label><div class="choices row">${ch('lowIncome','yes','해당')}${ch('lowIncome','no','아님')}${ch('lowIncome','unknown','모름')}</div></div>
+<div class="input-group"><label>본인/가구 재산 규모 <span class="help" onclick="alert('소득만 보는 정책도 있지만, 공공임대·전세대출·국취제는 재산 기준이 붙는 경우가 많습니다. 부동산, 보증금, 예금 등을 포함해 대략 선택하세요.')">?</span></label><select class="full" onchange="D.assetBand=this.value"><option value="unknown" ${D.assetBand==='unknown'?'selected':''}>모름</option><option value="1000" ${D.assetBand==='1000'?'selected':''}>1,000만 원 이하</option><option value="5000" ${D.assetBand==='5000'?'selected':''}>5,000만 원 이하</option><option value="10000" ${D.assetBand==='10000'?'selected':''}>1억 원 이하</option><option value="25400" ${D.assetBand==='25400'?'selected':''}>2.54억 원 이하</option><option value="34500" ${D.assetBand==='34500'?'selected':''}>3.45억 원 이하</option><option value="50000" ${D.assetBand==='50000'?'selected':''}>5억 원 이하</option><option value="999999" ${D.assetBand==='999999'?'selected':''}>5억 원 초과</option></select></div>
+<div class="input-group"><label>차량 가액</label><div class="choices row">${ch('carBand','0','차 없음')}${ch('carBand','4500','4,500만 원 이하')}${ch('carBand','999999','4,500만 원 초과')}${ch('carBand','unknown','모름')}</div></div>
+<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`}
+function step4(){const employed=['employed_regular','employed_contract','parttime','freelancer','self_employed'].includes(D.status);return `<div class="qtitle">근로 정보를 알려주세요</div><div class="qsub">재직자 저축, 지역 청년 노동자 지원, 햇살론유스 등을 확인해요.</div>
+${employed?`<div class="input-group"><label>현재 직장/일을 1년 이상 했나요?</label><div class="choices row">${ch('workPeriod','over1y','1년 이상')}${ch('workPeriod','under1y','1년 미만')}${ch('workPeriod','unknown','모름')}</div></div>
+<div class="input-group"><label>4대보험 가입되어 있나요? <span class="help" onclick="alert('4대보험은 국민연금·건강보험·고용보험·산재보험을 말해요. 재직자 통장/복지포인트 계열에서 자주 확인합니다.')">?</span></label><div class="choices row">${ch('insured','yes','가입')}${ch('insured','no','미가입')}${ch('insured','unknown','모름')}</div></div>
+<div class="input-group"><label>회사 유형</label><div class="choices">${ch('companyType','sme','중소기업·중견기업·소상공인')}${ch('companyType','large','대기업·공공기관')}${ch('companyType','self','프리랜서/개인사업/기타')}${ch('companyType','unknown','모름')}</div></div>
+<div class="input-group"><label>주당 근로시간</label><div class="choices row">${ch('weeklyHours','under15','15시간 미만')}${ch('weeklyHours','under30','30시간 미만')}${ch('weeklyHours','over30','30시간 이상')}${ch('weeklyHours','unknown','모름')}</div></div>`:`<div class="info-box">현재 상태가 미취업/학생 쪽이라 재직자 전용 문항은 건너뛰었어요. 대신 취업지원·교육·일경험 정책 쪽 점수가 올라갑니다.</div>`}
+<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`}
+function step5(){return `<div class="qtitle">마지막으로, 놓치고 싶지 않은 분야를 골라주세요</div><div class="qsub">선택하지 않아도 정책은 계산되지만, 선택한 분야는 결과에서 더 눈에 띄게 보여줘요.</div>
+<div class="choices">${multi('priorities','housing','주거','월세지원, 전세대출, 행복주택')}${multi('priorities','saving','저축·금융','도약계좌, 내일저축, 햇살론')}${multi('priorities','job','취업·훈련','국취제, 내일배움카드, KDT')}${multi('priorities','education','교육·장학','국가장학금, 근로장학금')}${multi('priorities','local','지역정책','경기/서울/인천/부산 등')}${multi('priorities','culture','문화','청년문화예술패스')}${multi('priorities','health','심리·복지','마음건강, 상담 바우처')}</div>
+<div class="input-group"><label>병역 이행으로 청년 나이 연장 확인이 필요한가요?</label><div class="choices row">${ch('militaryExtension','yes','예')}${ch('militaryExtension','no','아니오')}${ch('militaryExtension','unknown','모름')}</div><p class="mini-note">일부 정책은 병역 이행 기간만큼 연령 상한을 연장합니다. 여기서는 “추가 확인”으로만 표시해요.</p></div>
+<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="showResult()">결과 보기</button></div>`}
+function criterion(result,weight,good,bad,need){return {result,weight,good,bad,need}}
+function judge(criteria){let score=0,total=0,good=[],bad=[],need=[];criteria.forEach(c=>{total+=c.weight;if(c.result===true){score+=c.weight; if(c.good)good.push(c.good)}else if(c.result==='unknown'){score+=c.weight*.55; if(c.need)need.push(c.need)}else{if(c.bad)bad.push(c.bad)}});return {score:Math.round(score/total*100),good,bad,need}}
+function stateOf(score){if(score>=82)return 'very'; if(score>=66)return 'high'; if(score>=42)return 'check'; return 'low'}
+function stateLabel(st){return {very:'가능성 매우 높음',high:'가능성 높음',check:'추가 확인 필요',low:'가능성 낮음'}[st]}
+function priorityBoost(cat){const map={주거:'housing',금융:'saving',취업:'job',교육:'education',지역:'local',문화:'culture',복지:'health'};return (D.priorities||[]).includes(map[cat]||'')?4:0}
+function addBoost(obj,cat){obj.score=Math.min(100,obj.score+priorityBoost(cat));return obj}
+function calcPolicies(){
+ const a=parseInt(D.age,10)||0; const isStudent=D.status==='student_univ'||D.status==='student_grad'; const isUniv=D.status==='student_univ'; const isGrad=D.status==='student_grad'; const isJobseeker=D.status==='jobseeker'||D.status==='neet'; const isEmployed=['employed_regular','employed_contract','parttime','freelancer','self_employed'].includes(D.status); const isShortWork=D.weeklyHours==='under15'||D.weeklyHours==='under30'; const incomeAnn=annualIncome();
+ const policies=[]; function push(cat,icon,title,amount,desc,link,evalObj){evalObj=addBoost(evalObj,cat);const st=stateOf(evalObj.score);policies.push({cat,icon,title,amount,desc,link,score:evalObj.score,state:st,good:evalObj.good,bad:evalObj.bad,need:evalObj.need})}
+ push('주거','🏠','청년 월세 특별지원','월 최대 20만 원','부모와 따로 사는 무주택 청년의 월세를 지원하는 사업. 보증금·월세·소득·재산 기준을 함께 봅니다.','https://www.myhome.go.kr',judge([
+  criterion(ageIn(19,34)||(!ageIn(19,34)&&D.militaryExtension==='yes'?'unknown':false),18,'만 19~34세 범위','나이 조건 확인 필요','병역 연장 여부 확인'),
+  criterion(D.selfLiving==='yes',14,'부모와 별도 거주','독립 거주가 필요할 수 있음','별도 거주 여부 확인'),
+  criterion(D.housingType==='monthly',14,'월세 거주','월세 거주자 중심 사업','월세 여부 확인'),
+  criterion(D.homeOwner==='no'?true:D.homeOwner==='unknown'?'unknown':false,14,'무주택으로 입력됨','무주택 조건 확인 필요','무주택 여부 확인'),
+  criterion(num(D.monthlyRent)===null?'unknown':num(D.monthlyRent)<=70,10,'월세 70만 원 이하로 입력됨','월세 기준 초과 가능성','월세 금액 확인'),
+  criterion(num(D.deposit)===null?'unknown':num(D.deposit)<=5000,8,'보증금 5천만 원 이하로 입력됨','보증금 기준 초과 가능성','보증금 확인'),
+  criterion(myMonthlyUnder(MEDIAN_1*.6),12,'본인 소득이 낮은 편','청년독립가구 소득 기준 초과 가능성','본인 소득 확인'),
+  criterion(hhUnder(100),10,'가구소득 100% 이하로 입력됨','원가구 소득 기준 초과 가능성','원가구 소득 확인')
+ ]));
+ push('주거','🏘️','LH 행복주택 청년형','시세보다 낮은 임대료','청년·대학생·사회초년생 등을 위한 공공임대주택. 무주택, 소득, 자산, 자동차 기준을 봅니다.','https://apply.lh.or.kr',judge([
+  criterion(ageIn(19,39)||isStudent,18,'청년/학생 연령대에 해당','연령 또는 공급유형 확인 필요','학생/청년 유형 확인'),
+  criterion(D.homeOwner==='no'?true:D.homeOwner==='unknown'?'unknown':false,18,'무주택으로 입력됨','무주택 요건 확인 필요','무주택 여부 확인'),
+  criterion(hhUnder(100),14,'소득 기준 확인 가능성 있음','소득 기준 초과 가능성','가구소득 확인'),
+  criterion(assetUnder(25400),14,'자산 기준 가능성 있음','자산 기준 초과 가능성','자산 기준 확인'),
+  criterion(carUnder(4563),10,'자동차 기준 가능성 있음','자동차 가액 기준 초과 가능성','자동차 가액 확인'),
+  criterion(D.housingType!=='own',8,'현재 자가가 아님','자가 보유 시 제한 가능','현재 주거 확인')
+ ]));
+ push('주거','🏡','LH 청년전세임대','전세금 지원/저리 임대','입주대상자로 선정된 청년이 집을 찾으면 LH가 전세계약 후 재임대하는 방식입니다.','https://apply.lh.or.kr',judge([
+  criterion(ageIn(19,39)||isStudent,18,'청년/대학생 범위','연령 또는 유형 확인 필요','청년/대학생 유형 확인'),
+  criterion(D.homeOwner==='no'?true:D.homeOwner==='unknown'?'unknown':false,18,'무주택으로 입력됨','무주택 요건 확인 필요','무주택 여부 확인'),
+  criterion(hhUnder(100),16,'소득 기준 가능성 있음','소득 기준 초과 가능성','본인+부모 소득 확인'),
+  criterion(assetUnder(33700),12,'자산 기준 가능성 있음','자산 기준 초과 가능성','자산 기준 확인'),
+  criterion(carUnder(4563),8,'자동차 기준 가능성 있음','자동차 가액 기준 초과 가능성','자동차 가액 확인'),
+  criterion(D.selfLiving!=='no'||isStudent,8,'독립/학생 수요 가능성 있음','현재 거주 형태상 우선도 낮음','입주 희망 여부 확인')
+ ]));
+ push('주거','🔑','청년전용 버팀목 전세자금대출','전세자금 저리 대출','만 19~34세 무주택 세대주 또는 예비세대주 대상 전세대출. 소득·자산 기준이 있습니다.','https://www.myhome.go.kr',judge([
+  criterion(ageIn(19,34)?true:(D.militaryExtension==='yes'?'unknown':false),18,'청년 연령대','나이 조건 확인 필요','병역 연장 여부 확인'),
+  criterion(D.homeOwner==='no'?true:D.homeOwner==='unknown'?'unknown':false,18,'무주택으로 입력됨','무주택 조건 확인 필요','무주택 여부 확인'),
+  criterion(incomeUnderAnnual(5000),15,'연소득 5천만 원 이하 가능성','소득 기준 초과 가능성','연소득 확인'),
+  criterion(assetUnder(34500),14,'순자산 기준 가능성 있음','자산 기준 초과 가능성','순자산 확인'),
+  criterion(D.housingType==='jeonse'||D.housingType==='monthly'||D.housingType==='etc',8,'전월세 수요 가능성 있음','자가/공공임대 거주로 우선도 낮음','전세 이사 계획 확인')
+ ]));
+ push('주거','🏦','중소기업 취업청년 전월세보증금대출','최대 1억 원 내외','중소·중견기업 재직 청년 또는 청년창업자 대상 저리 보증금 대출. 운영·접수 여부는 시기별 확인 필요.','https://www.myhome.go.kr',judge([
+  criterion(ageIn(19,34)?true:(D.militaryExtension==='yes'?'unknown':false),16,'청년 연령대','나이 조건 확인 필요','병역 연장 여부 확인'),
+  criterion(D.companyType==='sme'?true:D.companyType==='unknown'?'unknown':false,16,'중소/중견/소상공인 재직으로 입력됨','회사 유형 조건 확인 필요','회사 유형 확인'),
+  criterion(D.homeOwner==='no'?true:D.homeOwner==='unknown'?'unknown':false,16,'무주택으로 입력됨','무주택 조건 확인 필요','무주택 여부 확인'),
+  criterion(incomeUnderAnnual(3500),13,'외벌이 기준 소득 가능성 있음','소득 기준 초과 가능성','소득 기준 확인'),
+  criterion(assetUnder(34500),12,'자산 기준 가능성 있음','자산 기준 초과 가능성','순자산 확인'),
+  criterion(isEmployed,10,'재직/근로 상태','재직자 중심 정책','재직 여부 확인')
+ ]));
+ push('주거','📘','청년 주택드림 청약통장','우대금리/청약 연계','만 19~34세 무주택자, 일정 소득 이하 청년이 가입할 수 있는 우대형 청약통장입니다.','https://www.myhome.go.kr',judge([
+  criterion(ageIn(19,34)?true:(D.militaryExtension==='yes'?'unknown':false),24,'청년 연령대','나이 조건 확인 필요','병역 연장 여부 확인'),
+  criterion(D.homeOwner==='no'?true:D.homeOwner==='unknown'?'unknown':false,24,'무주택으로 입력됨','무주택 조건 확인 필요','무주택 여부 확인'),
+  criterion(incomeUnderAnnual(5000),24,'연소득 5천만 원 이하 가능성','소득 기준 초과 가능성','연소득 확인')
+ ]));
+ push('금융','💰','청년미래적금 / 청년도약계좌 계열','정부기여·비과세 계열','2026년에는 청년미래적금 출시와 청년도약계좌 연계가 함께 안내되고 있어 가입 가능 여부를 공식 금융기관에서 확인해볼 만합니다.','https://www.kinfa.or.kr',judge([
+  criterion(ageIn(19,34)?true:(D.militaryExtension==='yes'?'unknown':false),22,'청년 연령대','나이 조건 확인 필요','병역 연장 여부 확인'),
+  criterion(incomeAnn===null?'unknown':incomeAnn>0,14,'소득이 있어 가입심사 가능','소득증빙이 없으면 제한 가능','소득증빙 확인'),
+  criterion(incomeUnderAnnual(7500),22,'개인소득 기준 가능성 있음','개인소득 기준 초과 가능성','개인소득 확인'),
+  criterion(hhUnder(180),18,'가구소득 기준 가능성 있음','가구소득 기준 초과 가능성','가구소득 확인')
+ ]));
+ push('금융','🌱','청년내일저축계좌','월 10만 원 저축+정부매칭','저소득 근로 청년의 자산형성을 돕는 계좌. 근로·사업소득과 가구소득 기준을 봅니다.','https://www.bokjiro.go.kr',judge([
+  criterion(ageIn(15,39),18,'연령 범위 가능','나이 조건 확인 필요','연령 확인'),
+  criterion(isEmployed,18,'근로/사업 상태','근로·사업소득 필요','근로소득 여부 확인'),
+  criterion(incomeAnn===null?'unknown':incomeAnn>0,12,'근로·사업소득 입력됨','근로·사업소득 필요','월 10만 원 이상 소득 확인'),
+  criterion(hhUnder(50),22,'중위소득 50% 이하 가능성','가구소득 기준 초과 가능성','가구소득/소득인정액 확인'),
+  criterion(D.lowIncome==='yes'?true:D.lowIncome==='unknown'?'unknown':hhUnder(50),8,'기초·차상위 가능성 있음','','기초·차상위 여부 확인')
+ ]));
+ push('금융','☀️','햇살론유스','최대 1,200만 원 대출','대학생·미취업 청년·사회초년생에게 생활자금 등을 지원하는 서민금융 대출입니다.','https://www.kinfa.or.kr',judge([
+  criterion(ageIn(19,34),22,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isStudent||isJobseeker||D.workPeriod==='under1y',22,'학생/미취업/사회초년생 가능성','대상 유형 확인 필요','재직 1년 이하 여부 확인'),
+  criterion(incomeUnderAnnual(3500),18,'연소득 3,500만 원 이하 가능성','소득 기준 초과 가능성','연소득 확인'),
+  criterion(D.status!=='self_employed',6,'일반 청년 유형','사업자는 별도 확인 필요','직업 유형 확인')
+ ]));
+ push('취업','💼','국민취업지원제도 I유형/청년특례','구직촉진수당+취업지원','미취업 청년에게 취업지원서비스와 구직촉진수당을 지원합니다. 청년특례는 소득 기준이 완화됩니다.','https://www.work24.go.kr',judge([
+  criterion(ageIn(15,34),18,'청년특례 연령대','청년특례 나이 확인 필요','병역 연장/일반유형 확인'),
+  criterion(isJobseeker||isShortWork,22,'구직/미취업 상태에 가까움','재직자는 우선도 낮음','구직 상태 확인'),
+  criterion(hhUnder(120),20,'청년특례 소득 기준 가능성','소득 기준 초과 가능성','가구소득 확인'),
+  criterion(assetUnder(50000),14,'청년 재산 기준 가능성','재산 기준 초과 가능성','가구 재산 확인')
+ ]));
+ push('취업','🎓','국민내일배움카드','5년간 300~500만 원 훈련비','구직자와 재직자의 직업훈련비를 지원하는 카드. 일부 제외대상을 제외하면 폭넓게 확인할 만합니다.','https://www.work24.go.kr',judge([
+  criterion(a>=15&&a<=75,20,'연령상 확인 가능','연령 확인 필요','연령 확인'),
+  criterion(D.status!=='self_employed'||incomeUnderAnnual(40000)!==false,8,'일반 신청 가능성 있음','일부 고소득 자영업자는 제한 가능','제외대상 확인'),
+  criterion(true,20,'구직자·재직자 모두 확인 가능','','')
+ ]));
+ push('취업','💻','K-디지털 트레이닝','디지털 훈련비 대폭 지원','AI·개발·데이터 등 디지털 분야 취업/전직 훈련. 국민내일배움카드 발급 대상이면 함께 확인하면 좋습니다.','https://www.work24.go.kr',judge([
+  criterion(a>=15&&a<=75,18,'훈련 참여 연령 가능','연령 확인 필요','연령 확인'),
+  criterion(D.priorities.includes('job'),8,'취업·훈련 관심 선택됨','','훈련 희망 여부 확인'),
+  criterion(D.status!=='self_employed'||D.weeklyHours!=='over30',8,'훈련 참여 가능성 있음','재직/사업 상황에 따라 제한 가능','훈련 가능 시간 확인'),
+  criterion(true,14,'국민내일배움카드와 함께 확인 추천','','')
+ ]));
+ push('취업','🧭','미래내일 일경험 사업','인턴/프로젝트형 일경험','미취업 청년이 기업·공공기관 일경험 프로그램에 참여하는 사업입니다. 모집 공고별 조건이 다릅니다.','https://yw.work24.go.kr/main.do',judge([
+  criterion(ageIn(15,34),22,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isJobseeker||isStudent,22,'미취업/학생 유형 가능성','재직자는 우선도 낮음','미취업 여부 확인'),
+  criterion(D.graduated==='yes'||D.graduated==='unknown'||isStudent,8,'공고별 지원 가능성 있음','','졸업/재학 가능 공고 확인')
+ ]));
+ push('교육','📚','국가장학금 I유형','등록금 구간별 지원','국내 대학생의 등록금을 소득구간에 따라 지원합니다. 재학생은 신청기간을 특히 주의해야 합니다.','https://www.kosaf.go.kr',judge([
+  criterion(isUniv,26,'대학생/휴학생으로 입력됨','대학생 대상 정책','학적 상태 확인'),
+  criterion(D.schoolLevel!=='graduate',12,'대학원생 아님','대학원생은 일반 국가장학금 I유형과 다름','학교 구분 확인'),
+  criterion(hhUnder(999),10,'소득구간 산정 필요','소득구간 산정 필요','학자금 지원구간 확인'),
+  criterion(true,8,'신입/편입/복학생도 확인 추천','','성적·수혜횟수 확인')
+ ]));
+ push('교육','📖','국가근로장학금','교내외 근로장학금','대학생이 학교/기관에서 근로하고 장학금을 받는 제도. 소득구간과 성적 기준을 봅니다.','https://www.kosaf.go.kr',judge([
+  criterion(isUniv,22,'대학생/휴학생으로 입력됨','대학생 대상 정책','학적 상태 확인'),
+  criterion(D.schoolLevel!=='graduate',10,'대학원생 아님','대학원생/졸업생은 제한 가능','학교 구분 확인'),
+  criterion(hhUnder(999),10,'학자금 지원구간 산정 필요','','소득구간 확인'),
+  criterion(true,8,'직전학기 성적 등 학교 기준 확인 필요','','성적 기준 확인')
+ ]));
+ push('교육','🎒','취업 후 상환 학자금대출','등록금+생활비 대출','대학(원)생이 학자금을 빌리고 취업 후 소득 발생 시 상환하는 제도입니다.','https://www.kosaf.go.kr',judge([
+  criterion(isStudent,24,'학생 유형으로 입력됨','학생 대상 정책','학적 상태 확인'),
+  criterion(ageIn(18,45)||isStudent,8,'연령/학적 확인 가능','','세부 연령 확인'),
+  criterion(true,8,'등록금/생활비 필요 시 확인 추천','','성적·소득구간 확인')
+ ]));
+ push('복지','🧠','청년마음건강지원/심리상담 바우처','심리상담 지원','청년 대상 심리상담·정서지원 사업은 지자체/복지로에서 모집 여부가 달라 수시 확인이 필요합니다.','https://www.bokjiro.go.kr',judge([
+  criterion(ageIn(19,34),24,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(true,12,'소득 제한이 없거나 우선순위 방식인 경우가 많음','','지역 모집 여부 확인'),
+  criterion(D.priorities.includes('health'),6,'심리·복지 관심 선택됨','','상담 필요 여부 확인')
+ ]));
+ push('문화','🎟️','청년문화예술패스','연 15~20만 원 문화비','2026년 기준 19~20세 청년에게 공연·전시·영화·도서 비용을 지원하는 문화패스입니다.','https://youthculturepass.or.kr',judge([
+  criterion(ageIn(19,20),36,'19~20세 연령대','해당 연령이 아님','출생연도 확인'),
+  criterion(D.region!=='',8,'거주 지역 입력됨','','지역 예산 소진 여부 확인'),
+  criterion(true,6,'생애 최초 지원 여부 확인 필요','','이전 사용 이력 확인')
+ ]));
+ push('지역','🟦','경기도 청년기본소득','분기별 25만 원','경기도에 일정 기간 거주한 24세 청년에게 지역화폐를 지급하는 제도입니다. 2026년 성남·고양은 제외 공지.','https://www.gg.go.kr',judge([
+  criterion(D.region==='경기',18,'경기도 거주','경기도 거주자 대상','거주 지역 확인'),
+  criterion(a===24,22,'24세로 입력됨','24세 대상 정책','분기별 생년월일 확인'),
+  criterion(D.ggArea==='normal'?true:D.ggArea==='unknown'?'unknown':false,12,'성남/고양 제외 지역','2026년 성남·고양은 제외 공지','세부 주소 확인'),
+  criterion(D.ggLongResidence==='yes'?true:D.ggLongResidence==='unknown'?'unknown':false,14,'경기도 장기 거주 조건 가능','거주 기간 조건 미충족 가능','3년 계속/합산 10년 확인')
+ ]));
+ push('지역','🌉','경기도 청년 노동자 통장','2년 후 목돈 형성','경기도 거주 근로 청년이 매월 저축하면 경기도 지원금이 더해지는 자산형성 사업입니다.','https://account.gfgf.kr',judge([
+  criterion(D.region==='경기',18,'경기도 거주','경기도 거주자 대상','거주 지역 확인'),
+  criterion(ageIn(19,39),16,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isEmployed,18,'근로 상태','근로 청년 대상','근로 여부 확인'),
+  criterion(hhUnder(120),16,'중위소득 120% 이하 가능성','소득 기준 초과 가능성','가구소득 확인'),
+  criterion(D.insured==='yes'?true:D.insured==='unknown'?'unknown':true,6,'근로 확인 가능성 있음','','공고별 4대보험/근로증빙 확인')
+ ]));
+ push('지역','🎁','경기도 청년 복지포인트','연 최대 120만 포인트 계열','경기도 중소·중견·소상공인 재직 청년에게 복지포인트를 주는 사업. 연도별 모집 공고 확인 필요.','https://youth.jobaba.net',judge([
+  criterion(D.region==='경기',18,'경기도 거주','경기도 거주자 대상','거주 지역 확인'),
+  criterion(ageIn(19,39),14,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isEmployed,16,'재직 상태','재직 청년 대상','재직 여부 확인'),
+  criterion(D.companyType==='sme'?true:D.companyType==='unknown'?'unknown':false,16,'중소/중견/소상공인 재직','회사 유형 조건 확인 필요','회사 유형 확인'),
+  criterion(D.insured==='yes'?true:D.insured==='unknown'?'unknown':false,10,'4대보험 가입','4대보험 조건 확인 필요','4대보험 확인')
+ ]));
+ push('지역','🏙️','서울 청년수당','월 50만 원 × 최대 6개월','서울 거주 미취업 청년 중 최종학력 졸업자 등을 대상으로 활동비와 프로그램을 지원합니다.','https://youth.seoul.go.kr',judge([
+  criterion(D.region==='서울',18,'서울 거주','서울 거주자 대상','거주 지역 확인'),
+  criterion(ageIn(19,34),18,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isJobseeker||isShortWork,18,'미취업/단기근로 가능성','재직자는 제한 가능','고용상태 확인'),
+  criterion(D.graduated==='yes'?true:D.graduated==='unknown'?'unknown':false,14,'졸업/중퇴/제적 상태','재학생은 제한 가능','최종학력 상태 확인')
+ ]));
+ push('지역','🌊','부산 청년 디딤돌카드+','월 30만 원 × 최대 6개월','부산 거주 미취업 청년에게 사회진입활동비와 취업역량 프로그램을 지원하는 사업입니다.','https://young.busan.go.kr',judge([
+  criterion(D.region==='부산',18,'부산 거주','부산 거주자 대상','거주 지역 확인'),
+  criterion(ageIn(18,39),16,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isJobseeker||isShortWork,18,'미취업/단기근로 가능성','재직자는 제한 가능','고용상태 확인'),
+  criterion(D.graduated==='yes'?true:D.graduated==='unknown'?'unknown':false,12,'졸업/중퇴/제적 상태','재학생은 제한 가능','최종학력 상태 확인'),
+  criterion(hhUnder(150),10,'소득 기준 가능성 있음','소득 기준 초과 가능성','건강보험료 기준 확인')
+ ]));
+ push('지역','🌐','인천 드림For 청년통장','재직 청년 자산형성','인천 거주 재직 청년이 저축하면 시 지원금이 더해지는 자산형성 사업입니다.','https://youth.incheon.go.kr',judge([
+  criterion(D.region==='인천',18,'인천 거주','인천 거주자 대상','거주 지역 확인'),
+  criterion(ageIn(18,39),16,'청년 연령대','나이 조건 확인 필요','연령 확인'),
+  criterion(isEmployed,16,'재직 상태','재직 청년 대상','재직 여부 확인'),
+  criterion(D.workPeriod==='over1y'?true:D.workPeriod==='unknown'?'unknown':false,14,'1년 이상 재직','동일기업 1년 이상 조건 확인 필요','재직기간 확인'),
+  criterion(D.insured==='yes'?true:D.insured==='unknown'?'unknown':false,10,'4대보험 가입','4대보험 조건 확인 필요','4대보험 확인'),
+  criterion(D.weeklyHours==='over30'?true:D.weeklyHours==='unknown'?'unknown':false,8,'주 30시간 이상 근로 가능성','근로시간 조건 확인 필요','주당 근로시간 확인')
+ ]));
+ return policies.sort((a,b)=>b.score-a.score);
 }
-function goBack(){
-  cur--; renderQ();
-}
-
-function skipField(id, defaultVal){
-  D[id] = defaultVal;
-  renderQ();
-}
-
-function step0(){
-  const rOpts=Object.keys(REGIONS).map(r=>`<option value="${r}" ${D.region_name===r?'selected':''}>${r}</option>`).join('');
-  return `<div class="qtitle">기본 정보를 알려주세요</div>
-<div class="qsub">나이와 지역에 따라 받을 수 있는 지원이 달라져요.</div>
-<div class="input-group"><label>나이</label>
-  <div class="input-row">
-    <input type="number" min="15" max="45" placeholder="예: 25" value="${D.age}" inputmode="numeric" oninput="D.age=this.value">
-    <span class="unit">세</span>
-    <button class="btn-skip" onclick="skipField('age', 25)">모름 (25세 기준)</button>
-  </div>
-</div>
-<div class="input-group"><label>거주 지역</label>
-  <select class="full" onchange="updateRegion(this.value)">
-    <option value="">지역 선택</option>${rOpts}
-  </select>
-</div>
-<div class="input-group"><label>성별</label>
-  <div class="choices" style="flex-direction:row;gap:7px">
-    ${ch('gender','male','남성')}${ch('gender','female','여성')}${ch('gender','other','무관')}
-  </div>
-</div>
-<div class="btn-row"><button class="btn pri" onclick="goNext()">다음 →</button></div>`;
-}
-
-function step1(){
-  const isEmp=D.status==='employed_regular'||D.status==='employed_contract';
-  const isStu=D.status==='university'||D.status==='graduate';
-  return `<div class="qtitle">현재 취업·학적 상태는?</div>
-<div class="qsub">가장 가까운 상태를 하나 선택해 주세요.</div>
-<div class="choices">
-  ${ch('status','employed_regular','정규직 취업 중')}
-  ${ch('status','employed_contract','계약직·파견직 취업 중')}
-  ${ch('status','parttime','아르바이트·프리랜서')}
-  ${ch('status','jobseeker','취업 준비 중 (취준생)')}
-  ${ch('status','university','대학교 재학·휴학')}
-  ${ch('status','graduate','대학원 재학·휴학')}
-  ${ch('status','neet','미취업·쉬는 중')}
-</div>
-${isEmp?`<div class="input-group"><label>현 직장 근무 기간</label>
-  <div class="input-row">
-    <input type="number" min="0" placeholder="예: 6" value="${D.employed_months}" inputmode="numeric" oninput="D.employed_months=this.value">
-    <span class="unit">개월</span>
-    <button class="btn-skip" onclick="skipField('employed_months', 0)">모름 (0개월)</button>
-  </div>
-</div>`:''}
-${isStu?`<div class="input-group"><label>학교 종류</label>
-  <div class="choices">
-    ${ch('school_type','2year','전문대 (2·3년제)')}
-    ${ch('school_type','4year','4년제 대학교')}
-    ${ch('school_type','graduate','대학원 (석·박사)')}
-  </div>
-</div>`:''}
-<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`;
-}
-
-function step2(){
-  return `<div class="qtitle">현재 어디서 살고 있나요?</div>
-<div class="qsub">거주 형태에 따라 주거 지원 항목이 달라져요.</div>
-<div class="choices">
-  ${ch('self_living','yes','혼자 자취 중 (독립)')}
-  ${ch('self_living','no','부모님·가족과 함께 거주')}
-  ${ch('self_living','dormitory','기숙사·공동생활관')}
-</div>
-${D.self_living==='yes'?`
-<div class="input-group"><label>주거 형태</label>
-  <div class="choices">
-    ${ch('housing_type','rent_monthly','월세')}
-    ${ch('housing_type','rent_deposit','전세')}
-    ${ch('housing_type','public','공공임대 (행복주택 등)')}
-    ${ch('housing_type','own','자가')}
-  </div>
-</div>
-${D.housing_type==='rent_monthly'?`<div class="input-group"><label>월 임차료 (월세 금액)</label>
-  <div class="input-row">
-    <input type="number" min="0" placeholder="예: 45" value="${D.housing_cost}" inputmode="decimal" oninput="D.housing_cost=this.value">
-    <span class="unit">만 원</span>
-    <button class="btn-skip" onclick="skipField('housing_cost', 0)">모름 (0원)</button>
-  </div>
-</div>`:''}`:'' }
-<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`;
-}
-
-function step3(){
-  return `<div class="qtitle">소득을 입력해 주세요</div>
-<div class="qsub">월 평균 기준 (세전). 잘 모르면 모름 버튼을 눌러주세요.</div>
-<div class="input-group"><label>본인 월 소득</label>
-  <div class="input-row">
-    <input type="number" min="0" placeholder="예: 220" value="${D.my_income}" inputmode="decimal" oninput="D.my_income=this.value">
-    <span class="unit">만 원</span>
-    <button class="btn-skip" onclick="skipField('my_income', 0)">모름 (0원)</button>
-  </div>
-</div>
-<div class="input-group"><label>부모(가구) 월 소득 합계</label>
-  <div class="input-row">
-    <input type="number" min="0" placeholder="예: 500" value="${D.parent_income}" inputmode="decimal" oninput="D.parent_income=this.value">
-    <span class="unit">만 원</span>
-    <button class="btn-skip" onclick="skipField('parent_income', 450)">모름 (평균 기준)</button>
-  </div>
-</div>
-<div class="input-group"><label>기초생활수급자 또는 차상위계층인가요?</label>
-  <div class="choices" style="flex-direction:row;gap:7px">
-    ${ch('low_income','yes','해당')}${ch('low_income','no','해당 없음')}
-  </div>
-</div>
-<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="goNext()">다음 →</button></div>`;
-}
-
-function step4(){
-  return `<div class="qtitle">가족 상황을 알려주세요</div>
-<div class="input-group"><label>부양 가족이 있나요?</label>
-  <div class="choices">
-    ${ch('has_dependent','no','없어요')}${ch('has_dependent','yes','있어요')}
-  </div>
-</div>
-${D.has_dependent==='yes'?`<div class="input-group"><label>부양 가족 수</label>
-  <div class="input-row"><input type="number" min="1" placeholder="예: 1" value="${D.dependent_count||''}" inputmode="numeric" oninput="D.dependent_count=this.value"><span class="unit">명</span></div>
-</div>`:''}
-<div class="input-group"><label>장애 등록이 되어 있나요?</label>
-  <div class="choices" style="flex-direction:row;gap:7px">
-    ${ch('disability','yes','있어요')}${ch('disability','no','없어요')}
-  </div>
-</div>
-<div class="btn-row"><button class="btn ghost" onclick="goBack()">← 이전</button><button class="btn pri" onclick="showResult()">결과 보기</button></div>`;
-}
-
-function showResult(){
-  if(!validateStep()) return;
-  
-  document.getElementById('form-area').style.display='none';
-  const ra=document.getElementById('result-area');
-  ra.style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
-
-  const age=parseInt(D.age)||0;
-  const myInc=parseFloat(D.my_income)||0;
-  const parentInc=parseFloat(D.parent_income)||0;
-  const totalHH=myInc+parentInc;
-  const isCapital=D.region_type==='capital';
-  const isMidSize=D.region_type==='metro';
-  const isLocal=D.region_type==='local';
-  const isStudent=D.status==='university'||D.status==='graduate';
-  const isJobseeker=D.status==='jobseeker'||D.status==='neet';
-  const isEmployed=D.status==='employed_regular'||D.status==='employed_contract'||D.status==='parttime';
-  const isRegular=D.status==='employed_regular';
-  const isSelfLiving=D.self_living==='yes';
-  const isMonthlyRent=D.housing_type==='rent_monthly';
-  const isLowIncome=D.low_income==='yes';
-  const hasDependent=D.has_dependent==='yes';
-  const isDisability=D.disability==='yes';
-
-  const myPct=Math.round(myInc/MEDIAN_1*100);
-  const hhPct=Math.round(totalHH/MEDIAN_1*100);
-
-  const supports=[
-    {cat:'🏠 주거 지원',icon:'🏠',title:'청년 월세 특별지원(국토부)',desc:'무주택 청년 월 최대 20만 원 생애 1회 지원. 만 19~34세 독립거주, 청년독립가구 중위 60% 이하 및 원가구 100% 이하.',amt:'월 최대 20만 원',link:'https://www.myhome.go.kr',
-      ok:age>=19&&age<=34&&isSelfLiving&&isMonthlyRent&&myPct<=60&&hhPct<=100,
-      cond:age>=19&&age<=34&&isSelfLiving&&isMonthlyRent&&(myPct>60||hhPct>100)&&myPct<=80,
-      reason:age<19||age>34?'나이 조건 미충족 (19~34세)':!isSelfLiving?'독립 거주(자취) 필요':!isMonthlyRent?'월세 거주자 한정':myPct>60?'원가구 혹은 청도가구 소득 기준 초과':''},
-    
-    {cat:'🏠 주거 지원',icon:'🏠',title:'LH 행복주택 (청년형)',desc:'만 19~39세 무주택 청년 대상 시세 60~80% 수준 공급 공공임대주택.',amt:'시세 60~80%',link:'https://www.lh.or.kr',
-      ok:age>=19&&age<=39&&D.housing_type!=='public',cond:false,reason:age<19||age>39?'나이 조건 미충족(19~39세)':'이미 공공임대 거주 중'},
-    
-    {cat:'🏠 주거 지원',icon:'🏠',title:'청년주택드림 청약통장',desc:'만 19~34세 무주택자, 연소득 5,000만 원 이하 우대형 청약. 최고 4.5% 금리 및 대출 연계.',amt:'이자 최고 4.5%',link:'https://www.molit.go.kr',
-      ok:age>=19&&age<=34&&myInc*12<=5000,cond:false,reason:age<19||age>34?'나이 조건 미충족':myInc*12>5000?'연소득 5,000만 원 초과':''},
-    
-    {cat:'💳 금융 지원',icon:'💳',title:'청년도약계좌',desc:'만 19~34세, 개인소득 연 7,500만 원 이하 및 가구 중위 180% 이하 대상 비과세 자산형성 지원.',amt:'정부 기여금 매칭',link:'https://www.kinfa.or.kr',
-      ok:age>=19&&age<=34&&myInc*12<=7500&&myInc>0,cond:age>=19&&age<=34&&myInc===0,reason:age<19||age>34?'나이 조건 미충족':myInc*12>7500?'연소득 초과':'소득증빙 의무 필수'},
-    
-    {cat:'💳 금융 지원',icon:'💳',title:'햇살론유스(서민금융진흥원)',desc:'만 19~34세 대학생, 미취업 청년 및 사회초년생(재직 1년 이하) 대상 저금리 서민금융 대출.',amt:'최대 1,200만 원',link:'https://www.kinfa.or.kr',
-      ok:age>=19&&age<=34&&(myInc*12<=3500||isStudent||isJobseeker),cond:false,reason:age<19||age>34?'나이 조건 미충족':myInc*12>3500?'연 소득 3,500만 원 초과':''},
-    
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'국민취업지원제도 (I유형)',desc:'구직촉진수당 월 50만 원 × 6개월 지급 및 맞춤형 취업지원 서비스 제공 (중위소득 60% 이하 등).',amt:'월 50만 원 × 6개월',link:'https://www.work.go.kr',
-      ok:isJobseeker&&hhPct<=60,cond:isJobseeker&&hhPct>60,reason:!isJobseeker?'구직 준비 상태 필요':'소득 조건에 따라 II유형 연계 가능'},
-    
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'국민내일배움카드',desc:'일자리를 찾는 구직자 및 재직자에게 직업훈련비 전액 또는 일부 지원 (5년간 최대 500만 원).',amt:'최대 500만 원 지원',link:'https://www.hrd.go.kr',
-      ok:true,cond:false,reason:''},
-    
-    {cat:'💼 취업·교육 지원',icon:'💼',title:'청년일자리도약장려금',desc:'취업애로청년을 정규직 채용한 중소기업에 지원금 지급 (취준생 고용 촉진 인센티브).',amt:'기업 인센티브 제공',link:'https://www.work.go.kr',
-      ok:isJobseeker&&age<=34,cond:false,reason:'취업 준비 청년 채용 시 기업 혜택'},
-    
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'지자체 청년수당 및 기본소득',desc:'서울 청년수당, 경기 청년기본소득 등 미취업/경제활동 지원 지자체 특화 제도.',amt:'지역별 상이',link:'https://www.youthcenter.go.kr',
-      ok:age>=19&&age<=34&&(isCapital||isMidSize),cond:isLocal,reason:''},
-    
-    {cat:'🌱 복지·생활비 지원',icon:'🌱',title:'청년마음건강 바우처',desc:'만 19~34세 청년 대상 정서·심리 전문 상담 서비스 제공 (소득 제한 없음 우선순위 존재).',amt:'상담 바우처 지원',link:'https://www.mohw.go.kr',
-      ok:age>=19&&age<=34,cond:false,reason:''},
-    
-    {cat:'📚 장학·교육비 지원',icon:'📚',title:'국가장학금 (한국장학재단)',desc:'대학생 가구 소득연계형 맞춤형 등록금 지원 제도.',amt:'구간별 차등/전액',link:'https://www.kosaf.go.kr',
-      ok:isStudent&&D.school_type!=='graduate',cond:false,reason:!isStudent?'대학 재학생 대상':D.school_type==='graduate'?'대학원생 별도 기준 적용':''},
-    
-    {cat:'📚 장학·교육비 지원',icon:'📚',title:'취업 후 상환 학자금대출',desc:'대학(원)생의 학업 안정을 위해 등록금과 생활비를 대출하고 취업 후 소득 발생 시 상환.',amt:'등록금+생활비',link:'https://www.kosaf.go.kr',
-      ok:isStudent,cond:false,reason:'대학(원) 재학생 한정'}
-  ];
-
-  const okList=supports.filter(s=>s.ok);
-  const condList=supports.filter(s=>!s.ok&&s.cond);
-  const cats=[...new Set(supports.map(s=>s.cat))];
-
-  const badgeClass=okList.length>=5?'badge-many':okList.length>=2?'badge-some':'badge-few';
-
-  function renderItem(s){
-    const state=s.ok?'ok':s.cond?'cond':'no';
-    const tagText=s.ok?'해당':s.cond?'조건부':'미해당';
-    const tagClass=s.ok?'tag-ok':s.cond?'tag-cond':'tag-no';
-    return `<div class="si ${state}">
-      <div class="si-icon">${s.icon}</div>
-      <div class="si-body">
-        <div class="si-header"><span class="si-title">${s.title}</span><span class="si-amt ${state}">${s.amt}</span></div>
-        <div class="si-desc">${s.desc}</div>
-        ${!s.ok&&s.reason?`<div class="si-reason">✕ ${s.reason}</div>`:''}
-        <div class="si-footer"><span class="tag ${tagClass}">${tagText}</span><a class="si-link" href="${s.link}" target="_blank">신청·확인 →</a></div>
-      </div>
-    </div>`;
-  }
-
-  let html=`<div class="card">
-    <div class="res-badge ${badgeClass}">해당 ${okList.length}개 · 조건부 ${condList.length}개</div>
-    <div class="res-title">${D.region_name||''}${D.region_name?' ':''}${D.age}세 청년 지원 진단 결과</div>
-    <div class="res-desc">2026년 기준 1인 가구 중위소득(약 ${MEDIAN_1}만 원)을 기반으로 정밀 진단된 결과예요.</div>
-    <div class="metric-grid">
-      <div class="metric"><div class="mlbl">본인 소득</div><div class="mval">${myInc?fmt(myInc)+'만':'0원/미입력'}</div><div class="msub">월 세전 기준</div></div>
-      <div class="metric"><div class="mlbl">중위소득 대비</div><div class="mval" style="color:${myPct<=60?'#534AB7':myPct<=100?'#BA7517':'#888'}">${myInc?myPct+'%':'-'}</div><div class="msub">2026 1인 가구</div></div>
-      <div class="metric"><div class="mlbl">해당 지원</div><div class="mval" style="color:#534AB7">${okList.length}개</div><div class="msub">조건부 ${condList.length}개</div></div>
-    </div>
-    ${!isSelfLiving&&age>=19&&age<=34?`<div class="info-box">💡 부모님과 동거 중이시군요. 독립(자취) 가구를 구성하면 청년 월세 지원 및 공공임대 주택 신청 자격 확보에 유리해집니다.</div>`:''}
-  </div>`;
-
-  cats.forEach(cat=>{
-    const items=supports.filter(s=>s.cat===cat);
-    const catOk=items.filter(s=>s.ok).length;
-    html+=`<div class="card"><div class="cat-title">${cat}<span style="font-size:11px;color:#aaa;font-weight:400;margin-left:4px">${catOk}개 해당</span></div><div class="support-list">`;
-    items.forEach(s=>{html+=renderItem(s)});
-    html+='</div></div>';
-  });
-
-  html+=`<div class="card"><div class="cat-title">💡 공식 통합 신청 창구</div>
-  <div class="tip-grid">
-    <div class="tip-card"><strong>정부24 / 복지로</strong>정부 복지 지원 포털<br>bokjiro.go.kr</div>
-    <div class="tip-card"><strong>온통청년</strong>국가 청년정책 통합 센터<br>youthcenter.go.kr</div>
-    <div class="tip-card"><strong>한국장학재단</strong>국가장학금 및 학자금대출<br>kosaf.go.kr</div>
-    <div class="tip-card"><strong>고용24</strong>취업 지원 및 직업훈련<br>work.go.kr</div>
-  </div>
-  <div class="warn-box" style="margin-bottom:0">⚠ 본 진단 결과는 2026년 공고 지침 기준이나, 부처 및 지자체별 세부 재산 기준 및 추가 배점 조건에 따라 실신청 시 결과가 다를 수 있으므로 링크된 공식 창구 조회를 권장합니다.</div>
-  </div>`;
-
-  html+=`<button class="apply-btn" onclick="window.open('https://www.youthcenter.go.kr','_blank')">온통청년 포털에서 추가 정책 찾기 →</button>
-  <button class="retry-btn" onclick="restart()">처음부터 다시 진단하기</button>
-  <p class="notice">이 결과는 모의 계산 기능이며, 실제 수급 가능 여부는 해당 시행 기관의 심사 결과에 따릅니다.</p>`;
-
-  ra.innerHTML=html;
-}
-
-function restart(){
-  cur=0;
-  D={age:'',gender:'',region_type:'',region_name:'',status:'',employed_months:'',school_type:'',self_living:'',housing_type:'',housing_cost:'',my_income:'',parent_income:'',has_dependent:'',dependent_count:'',disability:'',low_income:''};
-  document.getElementById('result-area').style.display='none';
-  document.getElementById('form-area').style.display='block';
-  renderQ();
-}
-
+function renderPolicy(p){const tagClass='tag-'+p.state;return `<div class="si ${p.state}" data-cat="${p.cat}"><div class="si-icon">${p.icon}</div><div class="si-body"><div class="si-header"><span class="si-title">${p.title}</span><span class="si-score">${p.score}점</span></div><div class="si-desc"><b>${p.amount}</b> · ${p.desc}</div><div class="si-list">${p.good.slice(0,3).map(x=>`<div class="si-line good">✓ ${x}</div>`).join('')}${p.need.slice(0,3).map(x=>`<div class="si-line need">? ${x}</div>`).join('')}${p.bad.slice(0,2).map(x=>`<div class="si-line bad">× ${x}</div>`).join('')}</div><div class="si-footer"><span class="tag ${tagClass}">${stateLabel(p.state)}</span><a class="si-link" href="${p.link}" target="_blank" rel="noopener">공식/신청처 확인 →</a></div></div></div>`}
+function showResult(){if(!validateStep())return; qs('form-area').style.display='none'; const ra=qs('result-area'); ra.style.display='block'; activeFilter='all'; const policies=calcPolicies(); const very=policies.filter(p=>p.state==='very').length; const high=policies.filter(p=>p.state==='high').length; const check=policies.filter(p=>p.state==='check').length; const top=policies[0]; const cats=[...new Set(policies.map(p=>p.cat))]; const income=num(D.myIncome); const myPct=income===null?null:Math.round(income/MEDIAN_1*100); let html=`<div class="card res-head"><div class="res-badge ${very+high>=5?'badge-many':very+high>=2?'badge-some':'badge-few'}">매우 높음 ${very}개 · 높음 ${high}개 · 확인 ${check}개</div><div class="res-title">${D.region} ${D.age}세 청년 지원 가능성 결과</div><div class="res-desc">가장 먼저 확인할 정책은 <b>${top.title}</b>입니다. 아래 결과는 실제 수급 확정이 아니라 “놓치면 아까운 정책 후보”를 골라주는 용도예요.</div><div class="metric-grid"><div class="metric"><div class="mlbl">본인 월소득</div><div class="mval">${income===null?'모름':fmt(income)+'만'}</div><div class="msub">세전 월평균</div></div><div class="metric"><div class="mlbl">1인가구 중위 대비</div><div class="mval">${myPct===null?'-':myPct+'%'}</div><div class="msub">2026년 약 ${MEDIAN_1}만 원 기준</div></div><div class="metric"><div class="mlbl">우선 확인</div><div class="mval" style="color:var(--pri)">${very+high}개</div><div class="msub">가능성 높은 후보</div></div></div></div>`;
+ html+=`<div class="card"><div class="cat-title">🔎 결과 필터</div><div class="filter-row"><button class="filter-btn on" onclick="filterResult('all',this)">전체</button><button class="filter-btn" onclick="filterResult('veryhigh',this)">높은 것만</button>${cats.map(c=>`<button class="filter-btn" onclick="filterResult('${c}',this)">${c}</button>`).join('')}</div><div class="info-box" style="margin-bottom:0">점수는 입력값 기준의 가능성입니다. <b>? 추가 확인 필요</b>가 많으면 공식 링크에서 소득·재산·거주기간·신청기간을 다시 보면 됩니다.</div></div>`;
+ cats.forEach(cat=>{const items=policies.filter(p=>p.cat===cat); const count=items.filter(p=>p.state==='very'||p.state==='high').length; html+=`<div class="card result-cat" data-catbox="${cat}"><div class="cat-title">${cat} 지원 <span style="font-size:11px;color:#aaa;font-weight:500;margin-left:4px">우선 확인 ${count}개</span></div><div class="support-list">${items.map(renderPolicy).join('')}</div></div>`});
+ html+=`<div class="card"><div class="cat-title">📌 용어 풀이</div><div class="glossary"><div class="term"><strong>기준중위소득</strong><span>정부가 복지대상자를 정할 때 쓰는 가구소득 기준선. 2026년 1인가구는 약 256.4만 원.</span></div><div class="term"><strong>소득인정액</strong><span>월급만이 아니라 재산을 월소득처럼 환산한 금액까지 더한 심사용 소득.</span></div><div class="term"><strong>무주택</strong><span>본인 또는 세대가 주택을 소유하지 않은 상태. 정책마다 세대 기준이 다를 수 있음.</span></div><div class="term"><strong>세대주/예비세대주</strong><span>주민등록상 한 세대의 대표자. 이사 후 세대주가 될 예정이면 예비세대주로 보는 경우가 있음.</span></div><div class="term"><strong>원가구</strong><span>청년 본인만이 아니라 부모님 쪽 가구까지 포함해 보는 개념.</span></div><div class="term"><strong>4대보험</strong><span>국민연금, 건강보험, 고용보험, 산재보험. 재직자 지원사업에서 자주 확인함.</span></div></div></div>`;
+ html+=`<button class="apply-btn" onclick="window.open('https://www.youthcenter.go.kr','_blank')">온통청년에서 추가 정책 검색 →</button><button class="retry-btn" onclick="restart()">처음부터 다시 진단하기</button><p class="notice">정책별 신청기간·예산소진·지역공고·중복수혜 제한에 따라 실제 결과가 달라질 수 있습니다.</p>`; ra.innerHTML=html; window.scrollTo({top:0,behavior:'smooth'});}
+function filterResult(type,btn){activeFilter=type;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('.result-cat').forEach(box=>{let cat=box.getAttribute('data-catbox');let showBox=false;box.querySelectorAll('.si').forEach(item=>{let pcat=item.getAttribute('data-cat');let state=item.classList.contains('very')||item.classList.contains('high');let show=type==='all'||type===pcat||(type==='veryhigh'&&state);item.classList.toggle('hide',!show);if(show)showBox=true});box.classList.toggle('hide',!showBox)})}
+function restart(){cur=0;D={age:'', region:'', ggArea:'', ggLongResidence:'', status:'', graduated:'', schoolLevel:'', selfLiving:'', housingType:'', homeOwner:'unknown', deposit:'', monthlyRent:'', myIncome:'', householdLevel:'unknown', lowIncome:'unknown', assetBand:'unknown', carBand:'unknown', workPeriod:'unknown', insured:'unknown', companyType:'unknown', weeklyHours:'unknown', priorities:['housing','saving','job','education','local','culture','health'], militaryExtension:'unknown'};qs('result-area').style.display='none';qs('form-area').style.display='block';renderQ()}
 renderQ();
 </script>
 </body>
